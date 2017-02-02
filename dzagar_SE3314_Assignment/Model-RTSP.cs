@@ -8,5 +8,8 @@ namespace dzagar_SE3314_Assignment
 {
     class RTSP
     {
+        //Loop, listening for clients to connect
+            //On connect, create thread for client
+            //Spawn new Client, RTP(?)
     }
 }

@@ -14,6 +14,7 @@ namespace dzagar_SE3314_Assignment
         [STAThread]
         static void Main()
         {
+            /// Default code.
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainView());
