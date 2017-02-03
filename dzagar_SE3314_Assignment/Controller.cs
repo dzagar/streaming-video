@@ -20,7 +20,7 @@ namespace dzagar_SE3314_Assignment
         {
             //allDone.Reset();
             //Initial info needed to secure socket
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            /*IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress ipAddr = ipHostInfo.AddressList[0];
             IPEndPoint localEP = new IPEndPoint(ipAddr, 8000);
             //Create socket
@@ -34,7 +34,7 @@ namespace dzagar_SE3314_Assignment
             } catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
-            }
+            }*/
         }
         public void SpawnRTSPThread()
         {
