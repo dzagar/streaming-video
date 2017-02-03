@@ -28,12 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.ListenButton = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // ListenButton
+            // 
+            this.ListenButton.Location = new System.Drawing.Point(455, 133);
+            this.ListenButton.Name = "ListenButton";
+            this.ListenButton.Size = new System.Drawing.Size(230, 85);
+            this.ListenButton.TabIndex = 0;
+            this.ListenButton.Text = "Listen";
+            this.ListenButton.UseVisualStyleBackColor = true;
+            this.ListenButton.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // MainView
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1147, 348);
+            this.Controls.Add(this.ListenButton);
+            this.Name = "MainView";
             this.Text = "Streaming Server";
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+        private System.Windows.Forms.Button ListenButton;
     }
 }
 

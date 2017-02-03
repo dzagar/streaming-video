@@ -8,5 +8,8 @@ namespace dzagar_SE3314_Assignment
 {
     class Client
     {
+        //Loop
+            //Receive timestamp
+            //Send timestamp
     }
 }
