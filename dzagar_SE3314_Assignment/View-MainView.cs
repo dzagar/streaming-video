@@ -14,28 +14,11 @@ namespace dzagar_SE3314_Assignment
 {
     public partial class MainView : Form
     {
+        Controller _controller;
         public MainView()
         {
             InitializeComponent();
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-
-            IPAddress ipAddr = ipHostInfo.AddressList[0];
-            Console.WriteLine(ipAddr.ToString());
-            //ipAddr is in format it doesn't like... investigate
-            IPEndPoint localEP = new IPEndPoint(ipAddr, Convert.ToInt32(PortNumberTextBox.Text));
-            Console.WriteLine(localEP.ToString());
-            try
-            {
-                Socket servSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                servSocket.Bind(localEP);
-                Console.WriteLine("Binding werked!");
-                //servSocket.Listen(100);
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+            _controller = new Controller();
         }
 
         private void ListenButton_Click(object sender, EventArgs e)
