@@ -15,6 +15,7 @@ namespace dzagar_SE3314_Assignment
         int portNo;
         Socket RTSPsocket = null;
         Socket clientSock = null;
+        IPEndPoint endPointServ;
 
         public RTSP(int port)
         {
@@ -29,7 +30,7 @@ namespace dzagar_SE3314_Assignment
                 Console.WriteLine(e.ToString());
             }
             //Set an endpoint for the server socket to bind to based on the IP Address and port
-            IPEndPoint endPointServ = new IPEndPoint(ipAddrServ, portNo);
+            endPointServ = new IPEndPoint(ipAddrServ, portNo);
             try
             {
                 //Instantiate and bind server socket
@@ -50,7 +51,7 @@ namespace dzagar_SE3314_Assignment
         }
 
         //On client connection, accept and return the client socket
-        public Socket OnClientConnection()
+        public Socket AcceptClient()
         {
             try
             {
@@ -63,6 +64,16 @@ namespace dzagar_SE3314_Assignment
                 return null;
             }
             
+        }
+
+        public IPAddress GetIP()
+        {
+            return ipAddrServ;
+        }
+
+        public IPEndPoint GetEndPoint()
+        {
+            return endPointServ;
         }
     }
 }

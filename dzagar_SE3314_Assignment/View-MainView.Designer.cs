@@ -87,6 +87,7 @@
             // 
             // FrameNoTextBox
             // 
+            this.FrameNoTextBox.Enabled = false;
             this.FrameNoTextBox.Location = new System.Drawing.Point(938, 125);
             this.FrameNoTextBox.Name = "FrameNoTextBox";
             this.FrameNoTextBox.Size = new System.Drawing.Size(100, 31);

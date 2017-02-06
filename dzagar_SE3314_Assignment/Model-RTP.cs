@@ -14,6 +14,7 @@ namespace dzagar_SE3314_Assignment
         //Store frame #, the MJPEG object, client endpoint, sending socket, TIMER?, packet
         int frameNo;
         int timerInterval = 200; //Chose 200 ms to be my interval
+        string currentFile;
         MJPEGVideo currentVideo;
         IPEndPoint endPointClient;
         Socket framesToCliSock;
@@ -41,7 +42,8 @@ namespace dzagar_SE3314_Assignment
             //Initialize RTP packet so it's ready to go
             rtpPacket = new RTPPacket();
             //Initialize MJPEG object
-            //currentVideo = new MJPEGVideo(videoFileName);
+            currentFile = videoFileName;
+            currentVideo = new MJPEGVideo(videoFileName);
         }
         
         //Send RTP packet
@@ -50,8 +52,39 @@ namespace dzagar_SE3314_Assignment
             //Increment frame number
             frameNo++;
             //Check if the frame is null (in which case, terminate), else send the packet to the client
-            
+            if (currentVideo.GetFollowingFrame() != null)
+            {
+                //Send packet!
+                framesToCliSock.SendTo(rtpPacket.EncapsulateRTPPacket(currentVideo.GetFollowingFrame()), endPointClient);
+            } else
+            {
+                //Safely close socket, stop timer
+                countdownTimer.Enabled = false;
+                framesToCliSock.Close();
+            }
 
+        }
+
+        //Small Controls
+        public void StartTime()
+        {
+            countdownTimer.Enabled = true;
+        }
+
+        public void PauseTime()
+        {
+            countdownTimer.Stop();
+        }
+
+        public void CloseSocketOnTeardown()
+        {
+            //Safely close socket
+            framesToCliSock.Close();
+        }
+
+        public void ClearMJPEGFile()
+        {
+            currentFile = "";
         }
     }
 }
