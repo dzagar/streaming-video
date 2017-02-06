@@ -30,19 +30,27 @@ namespace dzagar_SE3314_Assignment
             //Start thread
             this.listenRTSP.Start();
         }
-        public void RTSPListen()
+        private void RTSPListen()
         {
-
             //Create new RTSP
             _rtspModel = new RTSP();
             //Loop through until client connects
+            while (true)
+            {
+                //Socket RTSPSocket = _rtspModel.AcceptClientConnection()??? or something
                 //when client connects, create client thread
+                //listenClient = new Thread(hfdlshfjkdsl)
+                //start on client connection
+
+            }
+
         }
 
-        //Listen for clients function
-
         //On Client Connection function
+        private void OnClientConnection()
+        {
 
+        }
 
 
 
