@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model-Client.cs" />
+    <Compile Include="Model-MJPEGVideo.cs" />
+    <Compile Include="Model-RTPPacket.cs" />
     <Compile Include="Model-RTSP.cs" />
     <Compile Include="Model-RTP.cs" />
     <Compile Include="Controller.cs" />
