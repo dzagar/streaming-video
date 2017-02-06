@@ -23,7 +23,10 @@ namespace dzagar_SE3314_Assignment
 
         private void ListenButton_Click(object sender, EventArgs e)
         {
-
+            //Disable button
+            ListenButton.Enabled = false;
+            //Call controller onListen
+            _controller.onListenClick(sender, e);
         }
     }
 }

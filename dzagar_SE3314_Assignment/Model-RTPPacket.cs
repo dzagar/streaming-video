@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace dzagar_SE3314_Assignment
 {
-    class RTP
+    class RTPPacket
     {
-        //On creation, create UDP(RTP) socket
-        
-        //Send stuff function 
     }
 }

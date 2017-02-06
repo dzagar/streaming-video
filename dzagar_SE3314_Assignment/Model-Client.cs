@@ -8,6 +8,10 @@ namespace dzagar_SE3314_Assignment
 {
     class Client
     {
+        //Store video, RTP Model, port
+
+        //On creation, do something
+
         //Loop
             //Receive timestamp
             //Send timestamp

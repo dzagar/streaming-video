@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+using System.Windows.Forms;
 
 namespace dzagar_SE3314_Assignment
 {
@@ -15,28 +16,36 @@ namespace dzagar_SE3314_Assignment
         Client _clientModel;
         Thread listenRTSP;
         private static MainView _view;
-        RTSP _rtspModel;
+        RTSP _rtspModel = null;
         Thread listenClient;
 
-
-        public Controller()
+        public void onListenClick(object sender, EventArgs e)
         {
-            //Initial info needed to secure socket
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddr = ipHostInfo.AddressList[0];
-            IPEndPoint localEP = new IPEndPoint(ipAddr, 8000);
-            //Create socket
-            Socket servSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Udp);
-            //Bind socket
-            try
-            {
-                servSocket.Bind(localEP);
-                //servSocket.Listen(100);
-                
-            } catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+            //Find view
+            _view = (MainView)((Button)sender).FindForm();
+
+            //Spawn the listen RTSP thread
+            this.listenRTSP = new Thread(RTSPListen);
+
+            //Start thread
+            this.listenRTSP.Start();
         }
+        public void RTSPListen()
+        {
+
+            //Create new RTSP
+            _rtspModel = new RTSP();
+            //Loop through until client connects
+                //when client connects, create client thread
+        }
+
+        //Listen for clients function
+
+        //On Client Connection function
+
+
+
+
+
     }
 }
