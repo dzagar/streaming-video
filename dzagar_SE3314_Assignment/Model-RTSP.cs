@@ -10,12 +10,11 @@ namespace dzagar_SE3314_Assignment
 {
     class RTSP
     {
-        //Store the IP address, port number and server socket
+        //Store the IP address, port number, RTSP server socket, and connecting client socket
         IPAddress ipAddrServ;
         int portNo;
         Socket RTSPsocket = null;
         Socket clientSock = null;
-        byte[] rcvBuffer = new byte[2048];
 
         public RTSP(int port)
         {
