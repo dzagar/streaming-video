@@ -11,7 +11,7 @@ namespace dzagar_SE3314_Assignment
 {
     class RTP
     {
-        //Store frame #, the MJPEG object, client endpoint, sending socket, TIMER?
+        //Store frame #, the MJPEG object, client endpoint, sending socket, TIMER?, packet
         int frameNo;
         int timerInterval = 200; //Chose 200 ms to be my interval
         MJPEGVideo currentVideo;
@@ -34,7 +34,14 @@ namespace dzagar_SE3314_Assignment
         //Create socket and load video (create MJPEG object)
         public void InitializeSocketAndVideo(string port, string videoFileName)
         {
-
+            //Create socket and initialize end point of client
+            framesToCliSock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            IPAddress ipAddr = IPAddress.Parse("127.0.0.1"); //local IP
+            endPointClient = new IPEndPoint(ipAddr, int.Parse(port));
+            //Initialize RTP packet so it's ready to go
+            rtpPacket = new RTPPacket();
+            //Initialize MJPEG object
+            //currentVideo = new MJPEGVideo(videoFileName);
         }
         
         //Send RTP packet
