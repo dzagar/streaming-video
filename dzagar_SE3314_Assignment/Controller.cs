@@ -25,10 +25,10 @@ namespace dzagar_SE3314_Assignment
             _view = (MainView)((Button)sender).FindForm();
 
             //Spawn the listen RTSP thread
-            this.listenRTSP = new Thread(RTSPListen);
-
+            listenRTSP = new Thread(RTSPListen);
+            listenRTSP.IsBackground = true;
             //Start thread
-            this.listenRTSP.Start();
+            listenRTSP.Start();
         }
         private void RTSPListen()
         {
