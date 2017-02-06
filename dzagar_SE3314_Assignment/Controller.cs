@@ -38,7 +38,7 @@ namespace dzagar_SE3314_Assignment
             //Create new RTSP
             _rtspModel = new RTSP(_view.GetPortNo());
             //Update server IP in view
-            SetServerIP(_rtspModel.GetIP().ToString());
+            _view.SetServerIPText(_rtspModel.GetIP().ToString());
             //Loop through
             while (true)
             {
@@ -120,12 +120,6 @@ namespace dzagar_SE3314_Assignment
                 
 
             }
-        }
-
-        //Set server IP address field
-        private void SetServerIP(string ip)
-        {
-            _view.SetServerIPText(ip);
         }
 
         //Show update in server activity
