@@ -8,5 +8,9 @@ namespace dzagar_SE3314_Assignment
 {
     class RTPPacket
     {
+        //Sequence number
+
+        //On packet encapsulation function 
+            //do stuff (need to look this up in more detail)
     }
 }

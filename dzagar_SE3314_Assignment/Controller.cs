@@ -49,7 +49,11 @@ namespace dzagar_SE3314_Assignment
         //On Client Connection function
         private void OnClientConnection()
         {
-
+            //Instantiate client and RTP model
+            while (true)
+            {
+                //Parse through client message
+            }
         }
 
 
