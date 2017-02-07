@@ -34,6 +34,7 @@ namespace dzagar_SE3314_Assignment
         public void RTSPListen()
         {
             AddServerActivity("Server is waiting patiently for a friend (client)...");
+            //Instantiate RTSP with port number
             _rtspModel = new RTSP(_view.GetPortNo());
             _view.SetServerIPText(_rtspModel.GetIP().ToString());
             _view.SetFrameNoText("0");
@@ -49,13 +50,14 @@ namespace dzagar_SE3314_Assignment
             }
         }
 
-        private void ClientConnection(Object obj)
+        private void ClientConnection(Object obj)   //Call proper fcn
         {
             ClientConnection((Socket)obj);
         }
 
-        private void ClientConnection(Socket sock)
+        private void ClientConnection(Socket sock)      //Maintain client communication!
         {
+            //Initialize necessary vars: rcvBuffer for receiving bytes from socket, new client, RTP model, current video etc
             byte[] rcvBuffer = new byte[1024];
             int randInt = 0;
             int i = 0;
@@ -66,46 +68,57 @@ namespace dzagar_SE3314_Assignment
             {
                 while (true)
                 {
+                    //Receive bytes; if not receiving, break
                     int numBytes = sock.Receive(rcvBuffer);
                     if (numBytes <= 0) break;
+                    //Get UTF8 string, print to view
                     string msg = Encoding.UTF8.GetString(rcvBuffer, 0, numBytes);
                     AddClientActivity(msg);
+                    //Break down message to find request type
                     char[] delimiters = { ',', ':', ';', '/', '\n', '\r', ' ' };
                     string[] brokenMsg = msg.Split(delimiters);
                     string requestType = brokenMsg[0];
+                    //if SETUP, do SETUP!
                     if (requestType == "SETUP")
                     {
-                        char[] equals = { '=' };
-                        string[] temp = msg.Split(equals);
-                        int clientPortNo = int.Parse(temp[1]);
+                        //index 20 is client port #
+                        int clientPortNo = int.Parse(brokenMsg[20]);
+                        //Create RTP model with client port
                         _rtpModel = new RTP(clientPortNo); 
+                        //Create new video with video name (index 6)
                         currentVid = new MJPEGVideo(brokenMsg[6]);
+                        //Generate random int to become unique client identifier
                         randInt = GenerateRandomInt();
+                        //Create new client and add to client list
                         newCli = new Client(randInt, clientPortNo, currentVid);
                         clients.Add(newCli);
                         i = clientCount++;
-                        ElapsedEventHandler sender = new ElapsedEventHandler(FileProcessingTimer);
+                        //Add timer to elapsed (client timer) delegate
                         clients.ElementAt(i).GetClientTimer().Elapsed += FileProcessingTimer;
+                        //Send client response
                         sock.Send(clients.ElementAt(i).ClientUTF8Response());
                     } else
                     {
-                        Console.WriteLine(requestType);
                         switch (requestType)
                         {
                             case "PLAY":
+                                //Send client response and start timer
                                 sock.Send(clients.ElementAt(i).ClientUTF8Response());
                                 clients.ElementAt(i).StartClientTimer();
                                 break;
                             case "PAUSE":
+                                //Send client response and stop timer
                                 sock.Send(clients.ElementAt(i).ClientUTF8Response());
                                 clients.ElementAt(i).StopClientTimer();
                                 break;
                             case "TEARDOWN":
+                                //Send client response, initiate teardown and remove client ID from list
                                 sock.Send(clients.ElementAt(i).ClientUTF8Response());
                                 clients.ElementAt(i).InitiateTeardown();
                                 uniqueClientIDs.Remove(clients.ElementAt(i).GetClientID());
                                 break;
                             default:
+                                //Just in case..
                                 break;
                         }
                     }
@@ -113,23 +126,25 @@ namespace dzagar_SE3314_Assignment
             } catch (SocketException e)
             {
                 Console.WriteLine(e.ToString());
+                //Safely close socket
                 if (sock != null) sock.Close();
             } finally
             {
+                //Stop timer and safely close socket no matter what
                 clients.ElementAt(i).StopClientTimer();
-                sock.Close();
+                if (sock != null) sock.Close();
             }
 
         }
 
-        private int GenerateRandomInt()
+        private int GenerateRandomInt()     //Generate unique client identifier
         {
             int newRand = rnd.Next();
-            while (uniqueClientIDs.Contains(newRand))
+            while (uniqueClientIDs.Contains(newRand))   //If random number already exists in list
             {
                 newRand = rnd.Next();
             }
-            uniqueClientIDs.Add(newRand);
+            uniqueClientIDs.Add(newRand);   //Add to list
             return newRand;
         }
 
@@ -137,15 +152,28 @@ namespace dzagar_SE3314_Assignment
         {
             System.Timers.Timer timer = (System.Timers.Timer)source;
             int i = 0;
-            while (i < clients.Count)
+            while (i < clients.Count)   //for each client
             {
-                if (clients.ElementAt(i).GetClientTimer().Equals(timer))
+                if (clients.ElementAt(i).GetClientTimer().Equals(timer))    //If the timers match
                 {
+                    //Create packet
                     RTPPacket newPacket = clients.ElementAt(i).CreatePacket();
                     _view.SetFrameNoText(clients.ElementAt(i).GetSeqNo().ToString());
-                    if (_view.ShowRTPHeader()) AddServerActivity(newPacket.GetPacketHeader().ToList().ToString());
-                    if (newPacket.GetPacketBytes() == null) clients.ElementAt(i).InitiateTeardown();
-                    else clients.ElementAt(i).GetClientRTP().SendPacketViaUDP(newPacket.GetPacketBytes());
+                    if (_view.ShowRTPHeader())      //If user has checked "Print Header" in view
+                    {
+                        //Display header as binary string (used Linq)
+                        AddServerActivity(string.Concat(newPacket.GetPacketHeader().Select(b => Convert.ToString(b, 2))));
+                    }
+                    //Teardown video if there are no bytes left
+                    if (newPacket.GetPacketBytes() == null)
+                    {
+                        clients.ElementAt(i).InitiateTeardown();
+                    }
+                    else
+                    {
+                        //SEND DA PACKET!
+                        clients.ElementAt(i).GetClientRTP().SendPacketViaUDP(newPacket.GetPacketBytes());
+                    }
                 }
                 i++;
             }
