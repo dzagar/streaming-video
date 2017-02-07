@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
 
@@ -10,7 +6,7 @@ namespace dzagar_SE3314_Assignment
 {
     class RTSP
     {
-        //Store the IP address, port number, RTSP server socket, and connecting client socket
+        //Store the IP address, port number, RTSP server socket, the end point, and connecting client socket
         IPAddress ipAddrServ;
         int portNo;
         Socket RTSPsocket = null;
@@ -50,13 +46,13 @@ namespace dzagar_SE3314_Assignment
             
         }
 
-        //On client connection, accept and return the client socket
-        public Socket AcceptClient()
+        public Socket AcceptClient()        //On client connection, accept and return the client socket
         {
             try
             {
-                //Wait for client to accept, then returns socket
+                //Wait for client to accept
                 clientSock = RTSPsocket.Accept();
+                //Returns socket
                 return clientSock;
             } catch (SocketException e)
             {
@@ -71,12 +67,15 @@ namespace dzagar_SE3314_Assignment
             
         }
 
-        public IPAddress GetIP()
+
+        //GET FUNCTIONS
+
+        public IPAddress GetIP()        //Get server IP address
         {
             return ipAddrServ;
         }
 
-        public IPEndPoint GetEndPoint()
+        public IPEndPoint GetEndPoint()     //Get server end point
         {
             return endPointServ;
         }

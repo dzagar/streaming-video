@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using System.Timers;
+﻿using System.Net;
 using System.Net.Sockets;
 
 namespace dzagar_SE3314_Assignment
@@ -17,8 +11,10 @@ namespace dzagar_SE3314_Assignment
 
         public RTP(int portNo)
         {
+            //Create UDP socket
             framesToCliSock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPAddress ipAddr = IPAddress.Parse("127.0.0.1"); //local IP
+            //Create client endpoint
             endPointClient = new IPEndPoint(ipAddr, portNo);
         }
 
@@ -27,8 +23,7 @@ namespace dzagar_SE3314_Assignment
             return endPointClient;
         }
         
-        //Send RTP packet
-        public void SendPacketViaUDP(byte[] packet)
+        public void SendPacketViaUDP(byte[] packet)        //Send RTP packet
         {
             framesToCliSock.SendTo(packet, endPointClient);
         }

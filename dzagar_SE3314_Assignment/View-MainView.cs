@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Sockets;
-using System.Net;
 
 namespace dzagar_SE3314_Assignment
 {
@@ -18,14 +9,16 @@ namespace dzagar_SE3314_Assignment
         public MainView()
         {
             InitializeComponent();
+            //Instantiate one instance of Controller
             _controller = new Controller();
+            //this.ListenButton_Click += new EventHandler(_controller.OnListen);
         }
 
         private void ListenButton_Click(object sender, EventArgs e)
         {
-            //Disable button
+            //Disable Listen button
             ListenButton.Enabled = false;
-            //Call controller onListen
+            //Call controller OnListen method
             _controller.OnListen(sender, e);
         }
 
@@ -36,7 +29,7 @@ namespace dzagar_SE3314_Assignment
             return int.Parse(PortNumberTextBox.Text);
         }
 
-        public bool ShowRTPHeader()
+        public bool ShowRTPHeader()     //Returns boolean value of Show RTP Header checkbox
         {
             return PrintHeaderCheckBox.Checked;
         }
@@ -55,7 +48,7 @@ namespace dzagar_SE3314_Assignment
 
         public void AddClientRequestText(string clientMsg)        //Add client response message to Client Request text box
         {
-            if (InvokeRequired)
+            if (InvokeRequired)     //required since we are multithreading
             {
                 this.Invoke(new Action<string>(AddClientRequestText), new object[] { clientMsg });
                 return;
@@ -65,7 +58,7 @@ namespace dzagar_SE3314_Assignment
 
         public void AddServerActivityText(string serverMsg)        //Add server activity message to Server dialog box
         {
-            if (InvokeRequired)
+            if (InvokeRequired)     //required since we are multithreading
             {
                 this.Invoke(new Action<string>(AddServerActivityText), new object[] { serverMsg });
                 return;
@@ -82,7 +75,5 @@ namespace dzagar_SE3314_Assignment
             }
             FrameNoTextBox.Text = frameNo;
         }
-
-
     }
 }

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Windows.Forms;
 using System.Timers;
@@ -13,21 +11,21 @@ namespace dzagar_SE3314_Assignment
 {
     public class Controller
     {
-        private static MainView _view;
-        private static readonly Random rnd = new Random();
-        List<int> uniqueClientIDs = new List<int>();
-        RTSP _rtspModel = null;
-        Thread listenRTSP;
-        List<Client> clients = new List<Client>();
-        Thread listenClient;
-        RTP _rtpModel;
-        int clientCount = 0;
+        private static MainView _view;  //reference to Main View
+        private static readonly Random rnd = new Random();  //For RNG (below)
+        List<int> uniqueClientIDs = new List<int>();    //To make sure IDs are unique
+        RTSP _rtspModel = null; //One instance of RTSP
+        Thread listenRTSP;  //RTSP listening thread
+        List<Client> clients = new List<Client>();     //List of clients to handle
+        Thread listenClient;    //Client listening thread
+        RTP _rtpModel;  //RTP model (used across clients)
+        int clientCount = 0;    //Keeps track of # clients, to index client list properly
 
-        public void OnListen(object sender, EventArgs e)
+        public void OnListen(object sender, EventArgs e)        //On Listen, find View reference and start listening RTSP
         {
             //Initialize view
             _view = (MainView)((Button)sender).FindForm();
-            //Spawn new RTSP thread
+            //Spawn new RTSP listening thread
             listenRTSP = new Thread(RTSPListen);
             listenRTSP.IsBackground = true;
             listenRTSP.Start();
@@ -35,10 +33,12 @@ namespace dzagar_SE3314_Assignment
 
         public void RTSPListen()
         {
+            AddServerActivity("Server is waiting patiently for a friend (client)...");
             _rtspModel = new RTSP(_view.GetPortNo());
+            _view.SetServerIPText(_rtspModel.GetIP().ToString());
+            _view.SetFrameNoText("0");
             while (true)
             {
-                AddServerActivity("Server is waiting patiently for a friend (client)...");
                 //Wait for new client to be accepted
                 Socket RTSPSocket = _rtspModel.AcceptClient();
                 AddServerActivity("Client at " + RTSPSocket.RemoteEndPoint.ToString() + " has joined.");
@@ -56,7 +56,6 @@ namespace dzagar_SE3314_Assignment
 
         private void ClientConnection(Socket sock)
         {
-            bool isSetup = false;
             byte[] rcvBuffer = new byte[1024];
             int randInt = 0;
             int i = 0;
@@ -65,39 +64,33 @@ namespace dzagar_SE3314_Assignment
             Client newCli = null;
             try
             {
-                while (!isSetup)
+                while (true)
                 {
                     int numBytes = sock.Receive(rcvBuffer);
                     if (numBytes <= 0) break;
                     string msg = Encoding.UTF8.GetString(rcvBuffer, 0, numBytes);
+                    AddClientActivity(msg);
                     char[] delimiters = { ',', ':', ';', '/', '\n', '\r', ' ' };
                     string[] brokenMsg = msg.Split(delimiters);
                     string requestType = brokenMsg[0];
-                    if (requestType == "SETUP" && !isSetup)
+                    if (requestType == "SETUP")
                     {
                         char[] equals = { '=' };
                         string[] temp = msg.Split(equals);
                         int clientPortNo = int.Parse(temp[1]);
-                        _rtpModel = new RTP(clientPortNo); //use port in this?
+                        _rtpModel = new RTP(clientPortNo); 
                         currentVid = new MJPEGVideo(brokenMsg[6]);
                         randInt = GenerateRandomInt();
                         newCli = new Client(randInt, clientPortNo, currentVid);
                         clients.Add(newCli);
                         i = clientCount++;
-                        //ElapsedEventHandler sender = new ElapsedEventHandler(FileProcessingTimer);
+                        ElapsedEventHandler sender = new ElapsedEventHandler(FileProcessingTimer);
                         clients.ElementAt(i).GetClientTimer().Elapsed += FileProcessingTimer;
-                        
-                        isSetup = true;
                         sock.Send(clients.ElementAt(i).ClientUTF8Response());
-                    }
-                    while (isSetup)
+                    } else
                     {
-                        int evenMoreBytes = sock.Receive(rcvBuffer);
-                        if (numBytes <= 0) break;
-                        string anotherMsg = Encoding.UTF8.GetString(rcvBuffer, 0, numBytes);
-                        string[] anotherBrokenMsg = msg.Split(delimiters);
-                        string anotherRequestType = anotherBrokenMsg[0];
-                        switch (anotherRequestType)
+                        Console.WriteLine(requestType);
+                        switch (requestType)
                         {
                             case "PLAY":
                                 sock.Send(clients.ElementAt(i).ClientUTF8Response());
@@ -111,11 +104,11 @@ namespace dzagar_SE3314_Assignment
                                 sock.Send(clients.ElementAt(i).ClientUTF8Response());
                                 clients.ElementAt(i).InitiateTeardown();
                                 uniqueClientIDs.Remove(clients.ElementAt(i).GetClientID());
-                                isSetup = false;
+                                break;
+                            default:
                                 break;
                         }
                     }
-
                 }
             } catch (SocketException e)
             {
@@ -146,13 +139,14 @@ namespace dzagar_SE3314_Assignment
             int i = 0;
             while (i < clients.Count)
             {
-                //if (timer == clients.ElementAt(i).GetClientTimer())
-                //{
+                if (clients.ElementAt(i).GetClientTimer().Equals(timer))
+                {
                     RTPPacket newPacket = clients.ElementAt(i).CreatePacket();
                     _view.SetFrameNoText(clients.ElementAt(i).GetSeqNo().ToString());
-                    if (_view.ShowRTPHeader()) AddServerActivity(newPacket.GetPacketHeader().ToString());
-                    clients.ElementAt(i).GetClientRTP().SendPacketViaUDP(newPacket.GetPacketBytes());
-                //}
+                    if (_view.ShowRTPHeader()) AddServerActivity(newPacket.GetPacketHeader().ToList().ToString());
+                    if (newPacket.GetPacketBytes() == null) clients.ElementAt(i).InitiateTeardown();
+                    else clients.ElementAt(i).GetClientRTP().SendPacketViaUDP(newPacket.GetPacketBytes());
+                }
                 i++;
             }
         }
