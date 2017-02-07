@@ -11,80 +11,26 @@ namespace dzagar_SE3314_Assignment
 {
     class RTP
     {
-        //Store frame #, the MJPEG object, client endpoint, sending socket, TIMER?, packet
-        int frameNo;
-        int timerInterval = 200; //Chose 200 ms to be my interval
-        string currentFile;
-        MJPEGVideo currentVideo;
+        //Store client endpoint, sending socket
         IPEndPoint endPointClient;
         Socket framesToCliSock;
-        Timer countdownTimer;
-        RTPPacket rtpPacket;
 
-        public RTP()
+        public RTP(int portNo)
         {
-            //Create elapsed event handler to handle elapsed event
-            ElapsedEventHandler sender = new ElapsedEventHandler(SendRTPPacket);
-            //Default frame to 0
-            frameNo = 0;
-            //Create new timer with specified interval and add handler
-            countdownTimer = new Timer(timerInterval);
-            countdownTimer.Elapsed += sender;
-        }
-
-        //Create socket and load video (create MJPEG object)
-        public void InitializeSocketAndVideo(string port, string videoFileName)
-        {
-            //Create socket and initialize end point of client
             framesToCliSock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPAddress ipAddr = IPAddress.Parse("127.0.0.1"); //local IP
-            endPointClient = new IPEndPoint(ipAddr, int.Parse(port));
-            //Initialize RTP packet so it's ready to go
-            rtpPacket = new RTPPacket();
-            //Initialize MJPEG object
-            currentFile = videoFileName;
-            currentVideo = new MJPEGVideo(videoFileName);
+            endPointClient = new IPEndPoint(ipAddr, portNo);
+        }
+
+        public IPEndPoint GetClientEndPoint()
+        {
+            return endPointClient;
         }
         
         //Send RTP packet
-        private void SendRTPPacket(Object source, ElapsedEventArgs e)
+        public void SendPacketViaUDP(byte[] packet)
         {
-            //Increment frame number
-            frameNo++;
-            //Check if the frame is null (in which case, terminate), else send the packet to the client
-            if (currentVideo.GetFollowingFrame() != null)
-            {
-                //Send packet!
-                framesToCliSock.SendTo(rtpPacket.EncapsulateRTPPacket(currentVideo.GetFollowingFrame()), endPointClient);
-            } else
-            {
-                //Safely close socket, stop timer
-                countdownTimer.Enabled = false;
-                framesToCliSock.Close();
-            }
-
-        }
-
-        //Small Controls
-        public void StartTime()
-        {
-            countdownTimer.Enabled = true;
-        }
-
-        public void PauseTime()
-        {
-            countdownTimer.Stop();
-        }
-
-        public void CloseSocketOnTeardown()
-        {
-            //Safely close socket
-            framesToCliSock.Close();
-        }
-
-        public void ClearMJPEGFile()
-        {
-            currentFile = "";
+            framesToCliSock.SendTo(packet, endPointClient);
         }
     }
 }

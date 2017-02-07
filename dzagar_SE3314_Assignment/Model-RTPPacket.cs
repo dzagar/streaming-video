@@ -8,20 +8,20 @@ namespace dzagar_SE3314_Assignment
 {
     class RTPPacket
     {
-        int seqNo;
+        int interval = 100;
         byte[] completePacket;
+        byte[] header;
 
-        public RTPPacket()
+        public RTPPacket(int seqNo, byte[] contents)
         {
-            seqNo = 100; //initial sequence #
+            long timestamp = seqNo * interval;
+            EncapsulateRTPPacket(seqNo, timestamp, contents);
         }
 
-        public byte[] EncapsulateRTPPacket(byte[] contents)
+        public void EncapsulateRTPPacket(int seqNo, long timestamp, byte[] contents)
         {
             int V = 2, P = 0, X = 0, CC = 0, M = 0, PT = 26;
             long SSRC = 17;
-            long timestamp = 100*seqNo;
-            seqNo++;
             int payload = contents.Length;
             //Create packet with payload plus 12 bytes of header
             completePacket = new byte[payload + 12];
@@ -41,13 +41,26 @@ namespace dzagar_SE3314_Assignment
             completePacket[9] = (byte)((SSRC & 0x00ff0000) >> 16);
             completePacket[10] = (byte)((SSRC & 0x0000ff00) >> 8);
             completePacket[11] = (byte)((SSRC & 0x000000ff));
-                
+            //Copy into header
+            for (int i = 0; i < 12; i++)
+            {
+                header[i] = completePacket[i];
+            }
             //Populate rest of the packet with data
             for (int i = 0; i < contents.Length; i++)
             {
                 completePacket[12 + i] = contents[i];
             }
+        }
+
+        public byte[] GetPacketBytes()
+        {
             return completePacket;
+        }
+
+        public byte[] GetPacketHeader()
+        {
+            return header;
         }
     }
 }

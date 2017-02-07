@@ -15,6 +15,7 @@ namespace dzagar_SE3314_Assignment
         MJPEGVideo currentVideo;
         Timer videoCountdown;
         int seqNo;
+        RTP rtpModel;
 
         public Client (int id, int port, MJPEGVideo vid)
         {
@@ -22,6 +23,25 @@ namespace dzagar_SE3314_Assignment
             clientID = id;
             portNo = port;
             currentVideo = vid;
+            rtpModel = new RTP(port);
+            videoCountdown = new Timer(id);
+        }
+
+        public RTPPacket CreatePacket()
+        {
+            RTPPacket packet = new RTPPacket(seqNo, currentVideo.GetFollowingFrame());
+            seqNo++;
+            return packet;
+        }
+
+        public int GetSeqNo()
+        {
+            return seqNo;
+        }
+
+        public RTP GetClientRTP()
+        {
+            return rtpModel;
         }
 
         public int GetClientID()
@@ -48,31 +68,6 @@ namespace dzagar_SE3314_Assignment
         {
             currentVideo.DeleteVideo();
         }
-
-        //Store socket
-        /*Socket clientSocket;
-
-        //On creation, initialize client socket
-        public Client(Socket tcpSock)
-        {
-            clientSocket = tcpSock;
-        }
-
-        //Receive info from client
-        public byte[] Communication()
-        {
-            //Set buffer size, I just randomly chose 2048
-            byte[] rcvBuffer = new byte[2048];
-            try
-            {
-                //Receive stream from socket, return
-                int rcvFromSocket = clientSocket.Receive(rcvBuffer);
-                return rcvBuffer;
-            } catch (SocketException e)
-            {
-                return null;
-            }
-        }*/
 
         //Send proper UTF8 response to client
         public byte[] ClientUTF8Response()

@@ -26,7 +26,7 @@ namespace dzagar_SE3314_Assignment
             //Disable button
             ListenButton.Enabled = false;
             //Call controller onListen
-            _controller.onListenClick(sender, e);
+            _controller.OnListen(sender, e);
         }
 
         //GET FUNCTIONS
@@ -34,6 +34,11 @@ namespace dzagar_SE3314_Assignment
         public int GetPortNo()         //Returns port number
         {
             return int.Parse(PortNumberTextBox.Text);
+        }
+
+        public bool ShowRTPHeader()
+        {
+            return PrintHeaderCheckBox.Checked;
         }
 
         //SET FUNCTIONS
