@@ -19,8 +19,8 @@ namespace dzagar_SE3314_Assignment
         public byte[] EncapsulateRTPPacket(byte[] contents)
         {
             int V = 2, P = 0, X = 0, CC = 0, M = 0, PT = 26;
-            long SSRC = 666;
-            long timestamp = 100;
+            long SSRC = 17;
+            long timestamp = 100*seqNo;
             seqNo++;
             int payload = contents.Length;
             //Create packet with payload plus 12 bytes of header
@@ -41,10 +41,11 @@ namespace dzagar_SE3314_Assignment
             completePacket[9] = (byte)((SSRC & 0x00ff0000) >> 16);
             completePacket[10] = (byte)((SSRC & 0x0000ff00) >> 8);
             completePacket[11] = (byte)((SSRC & 0x000000ff));
+                
             //Populate rest of the packet with data
-            for (int i = 1; i <= payload; i++)
+            for (int i = 0; i < contents.Length; i++)
             {
-                completePacket[11 + i] = contents[i];
+                completePacket[12 + i] = contents[i];
             }
             return completePacket;
         }

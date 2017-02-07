@@ -155,7 +155,6 @@
             this.Controls.Add(this.PortTextBoxLabel);
             this.Controls.Add(this.PortNumberTextBox);
             this.Controls.Add(this.ListenButton);
-            this.Enabled = false;
             this.Name = "MainView";
             this.Text = "Streaming Server";
             this.ResumeLayout(false);

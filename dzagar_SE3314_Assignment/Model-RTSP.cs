@@ -61,6 +61,11 @@ namespace dzagar_SE3314_Assignment
             } catch (SocketException e)
             {
                 Console.WriteLine(e.ToString());
+                //Safely close socket
+                if (!(clientSock == null))
+                {
+                    clientSock.Close();
+                }
                 return null;
             }
             
