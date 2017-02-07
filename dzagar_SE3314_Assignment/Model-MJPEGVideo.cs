@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.IO;
-
 namespace dzagar_SE3314_Assignment
 {
     class MJPEGVideo
@@ -12,10 +11,13 @@ namespace dzagar_SE3314_Assignment
         //On creation, do stuff
         public MJPEGVideo(string videoFileName)
         {
-            //---------------NOTE: FIGURE OUT HOW TO RELATIVELY REFERENCE CURRENT DIRECTORY
-            string path = "\\Documents\\Third Year\\Second Semester\\SE 3314\\Labs\\streaming-video\\dzagar_SE3314_Assignment\\Resources\\" + videoFileName;
+            //Store video files in C:\Videos and it will find them! Thanks Stack Overflow!
+            string targetDirectory = @"C:\Videos";
+            //Set current directory
+            Environment.CurrentDirectory = targetDirectory;
+            string filePath = Directory.GetCurrentDirectory();
             //Create new FileStream -- open file and readonly
-            videoStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            videoStream = new FileStream(videoFileName, FileMode.Open, FileAccess.Read);
         }
 
         public void DeleteVideo()       //Delete this video safely

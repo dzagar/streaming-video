@@ -49,7 +49,6 @@
             this.ListenButton.TabIndex = 0;
             this.ListenButton.Text = "Listen";
             this.ListenButton.UseVisualStyleBackColor = true;
-            this.ListenButton.Click += new System.EventHandler(this.ListenButton_Click);
             // 
             // PortNumberTextBox
             // 

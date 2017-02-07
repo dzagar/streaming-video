@@ -11,15 +11,7 @@ namespace dzagar_SE3314_Assignment
             InitializeComponent();
             //Instantiate one instance of Controller
             _controller = new Controller();
-            //this.ListenButton_Click += new EventHandler(_controller.OnListen);
-        }
-
-        private void ListenButton_Click(object sender, EventArgs e)
-        {
-            //Disable Listen button
-            ListenButton.Enabled = false;
-            //Call controller OnListen method
-            _controller.OnListen(sender, e);
+            this.ListenButton.Click += new EventHandler(_controller.OnListen);
         }
 
         //GET FUNCTIONS
@@ -35,6 +27,11 @@ namespace dzagar_SE3314_Assignment
         }
 
         //SET FUNCTIONS
+
+        public void DisableListenButton()
+        {
+            ListenButton.Enabled = false;
+        }
 
         public void SetServerIPText(string ipAddress)         //Set value in IP address text box
         {

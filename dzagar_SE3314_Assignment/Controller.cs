@@ -12,7 +12,7 @@ namespace dzagar_SE3314_Assignment
     public class Controller
     {
         private static MainView _view;  //reference to Main View
-        private static readonly Random rnd = new Random();  //For RNG (below)
+        private static readonly Random rnd = new Random();  //For RNG (below..)
         List<int> uniqueClientIDs = new List<int>();    //To make sure IDs are unique
         RTSP _rtspModel = null; //One instance of RTSP
         Thread listenRTSP;  //RTSP listening thread
@@ -25,6 +25,7 @@ namespace dzagar_SE3314_Assignment
         {
             //Initialize view
             _view = (MainView)((Button)sender).FindForm();
+            _view.DisableListenButton();
             //Spawn new RTSP listening thread
             listenRTSP = new Thread(RTSPListen);
             listenRTSP.IsBackground = true;
@@ -59,7 +60,6 @@ namespace dzagar_SE3314_Assignment
         {
             //Initialize necessary vars: rcvBuffer for receiving bytes from socket, new client, RTP model, current video etc
             byte[] rcvBuffer = new byte[1024];
-            int randInt = 0;
             int i = 0;
             MJPEGVideo currentVid = null;
             _rtpModel = null;
@@ -87,10 +87,8 @@ namespace dzagar_SE3314_Assignment
                         _rtpModel = new RTP(clientPortNo); 
                         //Create new video with video name (index 6)
                         currentVid = new MJPEGVideo(brokenMsg[6]);
-                        //Generate random int to become unique client identifier
-                        randInt = GenerateRandomInt();
                         //Create new client and add to client list
-                        newCli = new Client(randInt, clientPortNo, currentVid);
+                        newCli = new Client(GenerateRandomInt(), clientPortNo, currentVid);
                         clients.Add(newCli);
                         i = clientCount++;
                         //Add timer to elapsed (client timer) delegate
