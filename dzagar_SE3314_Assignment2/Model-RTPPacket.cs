@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace dzagar_SE3314_Assignment2
 {
-    class Model_RTPPacket
+    class RTPPacket
     {
+        //Unpack Frame
     }
 }
