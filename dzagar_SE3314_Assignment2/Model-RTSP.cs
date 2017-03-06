@@ -13,6 +13,7 @@ namespace dzagar_SE3314_Assignment2
         IPAddress ipAddrServ;
         int portNo;
         Socket RTSPSock = null;
+        Socket servSock = null;
         IPEndPoint endPointServ;
         int CSeqNum;
         byte[] rcvBuffer;
@@ -44,14 +45,14 @@ namespace dzagar_SE3314_Assignment2
         }
 
         //Send msg to server
-        public void SendServer(string action, int port, string vidName, IPAddress servIP, int sessionNo)
+        public void SendServer(string action, int port, string vidName, IPAddress servIP, String sessionNo)
         {
             String portStr = port.ToString();
             String servIPStr = servIP.ToString();
-            String msg = action + " rtsp://" + servIPStr + ":" + portStr + "/" + vidName + "RTSP/1.0\r\n" + "CSeq: " + CSeqNum + "\r\n";
-            if (action == "SETUP" || sessionNo == 0)
+            String msg = action + " rtsp://" + servIPStr + ":" + portStr + "/" + vidName + " RTSP/1.0\r\n" + "CSeq: " + CSeqNum + "\r\n";
+            if (action == "SETUP" || sessionNo == "no")
             {
-                msg += "Transport: RTP/UDP; client_port = 25000";
+                msg += "Transport: RTP/UDP; client_port= 25000";
             } else
             {
                 msg += "Session: " + sessionNo;
@@ -83,6 +84,12 @@ namespace dzagar_SE3314_Assignment2
             {
                 return "Error on socket: " + e.Message + "\r\n";
             }
+        }
+
+        //Reset sequence num
+        public void ResetSeqNum()
+        {
+            CSeqNum = 1;
         }
     }
 }

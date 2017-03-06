@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
+using System.Threading;
+using System.Drawing;
+using System.Net.Sockets;
 
 namespace dzagar_SE3314_Assignment2
 {
@@ -14,6 +17,8 @@ namespace dzagar_SE3314_Assignment2
         RTSP _rtspModel = null;
         RTP _rtpModel = null;
         String sessionNo = "";
+        Thread videoPlaybackThread = null;
+        byte[] frameBytes;
 
         //Connect button click
         public void OnConnect(object sender, EventArgs e)
@@ -27,6 +32,10 @@ namespace dzagar_SE3314_Assignment2
         //Exit button click
         public void OnExit(object sender, EventArgs e)
         {
+            if (videoPlaybackThread != null)
+            {
+                videoPlaybackThread.Abort();
+            }
             Application.Exit();
         }
 
@@ -34,9 +43,11 @@ namespace dzagar_SE3314_Assignment2
         public void OnSetup(object sender, EventArgs e)
         {
             _view = (View)((Button)sender).FindForm();
-            _rtspModel.SendServer("SETUP", GetPortNo(), GetVideoFilename(), GetServIPAddr(), 0);
+            _rtspModel.SendServer("SETUP", GetPortNo(), GetVideoFilename(), GetServIPAddr(), "no");
             String servResponse = _rtspModel.ListenServer();
-            UpdateServerActivity(ParseServerResponse(servResponse));
+            String[] msg = ParseServerResponse(servResponse);
+            sessionNo = msg[6];
+            UpdateServerActivity(FormatServerResponse(msg));
             UpdateClientActivity("New RTSP State: READY\r\n");
             _view.DisableButton("Setup");
             _view.EnableButton("Play");
@@ -45,19 +56,59 @@ namespace dzagar_SE3314_Assignment2
         //Play button click
         public void OnPlay(object sender, EventArgs e)
         {
-
+            _view = (View)((Button)sender).FindForm();
+            _rtspModel.SendServer("PLAY", GetPortNo(), GetVideoFilename(), GetServIPAddr(), sessionNo);
+            String servResponse = _rtspModel.ListenServer();
+            String[] msg = ParseServerResponse(servResponse);
+            if (msg[0] == "RTSP/1.0")
+            {
+                UpdateServerActivity(FormatServerResponse(msg));
+            }
+            if (videoPlaybackThread == null)
+            {
+                videoPlaybackThread = new Thread(PlaybackCommunications);
+                videoPlaybackThread.IsBackground = true;
+                videoPlaybackThread.Start();
+            }
+            UpdateClientActivity("New RTSP State: PLAYING\r\n");
+            _view.DisableButton("Play");
+            _view.EnableButton("Pause");
+            _view.EnableButton("Teardown");
         }
 
         //Pause button click
         public void OnPause(object sender, EventArgs e)
         {
-
+            _view = (View)((Button)sender).FindForm();
+            _rtspModel.SendServer("PAUSE", GetPortNo(), GetVideoFilename(), GetServIPAddr(), sessionNo);
+            String servResponse = _rtspModel.ListenServer();
+            String[] msg = ParseServerResponse(servResponse);
+            if (msg[0] == "RTSP/1.0")
+            {
+                UpdateServerActivity(FormatServerResponse(msg));
+            }
+            UpdateClientActivity("New RTSP State: PAUSED\r\n");
+            _view.DisableButton("Pause");
+            _view.EnableButton("Play");
         }
 
         //Teardown button click
         public void OnTeardown(object sender, EventArgs e)
         {
-
+            _view = (View)((Button)sender).FindForm();
+            _rtspModel.SendServer("TEARDOWN", GetPortNo(), GetVideoFilename(), GetServIPAddr(), sessionNo);
+            String servResponse = _rtspModel.ListenServer();
+            String[] msg = ParseServerResponse(servResponse);
+            if (msg[0] == "RTSP/1.0")
+            {
+                UpdateServerActivity(FormatServerResponse(msg));
+            }
+            UpdateClientActivity("New RTSP State: TEARDOWN\r\n");
+            _rtspModel.ResetSeqNum();
+            _view.DisableButton("Play");
+            _view.DisableButton("Pause");
+            _view.DisableButton("Teardown");
+            _view.EnableButton("Setup");
         }
 
         //Update server activity
@@ -75,14 +126,35 @@ namespace dzagar_SE3314_Assignment2
         //Video playback communications
         public void PlaybackCommunications()
         {
-
+            _rtpModel = new RTP(GetPortNo(), GetServIPAddr());
+            //loop
+            while (true)
+            {
+                frameBytes = _rtpModel.GetFrame();
+                if (frameBytes == null)
+                {
+                    _view.DisableButton("Pause");
+                    break;
+                }
+                Image frameImg = _rtpModel.FrameToImage(frameBytes);
+                byte[] header = new byte[12];
+                Buffer.BlockCopy(frameBytes, 0, header, 0, header.Length);
+                if (_view.ShowPacketReport())
+                {
+                    //figure this out
+                }
+                if (_view.ShowHeader())
+                {
+                    //figure this out
+                }
+            }
         }
 
         //RTSP Listen
         public void RTSPListen()
         {
             UpdateClientActivity("Client is waiting patiently for a friend (server)...");
-            _rtspModel = new RTSP(_view.GetPortNo(), _view.GetServIPAddr());
+            _rtspModel = new RTSP(GetPortNo(), GetServIPAddr());
             _rtspModel.ConnectServer();
             UpdateClientActivity("Client has connected to server.");
         }
@@ -106,16 +178,30 @@ namespace dzagar_SE3314_Assignment2
         }
 
         //Parse server response
-        public String ParseServerResponse(String msg)
+        public String[] ParseServerResponse(String msg)
         {
             msg = msg.Trim();
-            char[] delimiters = { ',', ':', ';', '/', '\n', '\r', ' ' };
-            String[] brokenMsg = msg.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-            sessionNo = brokenMsg[6];
-            msg = brokenMsg[0] + " " + brokenMsg[1] + " " + brokenMsg[2] + "\r\n";
-            msg += brokenMsg[3] + " " + brokenMsg[4] + "\r\n";
-            msg += brokenMsg[5] + " " + brokenMsg[6];
-            return msg;
+            Console.WriteLine(msg);
+            char[] delim = new char[0];
+            String[] brokenMsg = msg.Split(delim, StringSplitOptions.RemoveEmptyEntries);
+            return brokenMsg;
+        }
+
+        //Format server response
+        public String FormatServerResponse(String[] msg)
+        {
+            Console.WriteLine(msg[0]);
+            Console.WriteLine(msg[1]);
+            Console.WriteLine(msg[2]);
+            Console.WriteLine(msg[3]);
+            Console.WriteLine(msg[4]);
+            Console.WriteLine(msg[5]);
+            Console.WriteLine(msg[6]);
+            Console.WriteLine(msg[7]);
+            String resp = msg[0] + " " + msg[1] + " " + msg[2]
+                + "\r\n" + msg[3] + " " + msg[4] + "\r\n"
+                + msg[5] + " " + msg[6] + "\r\n";
+            return resp;
         }
     }
 }
