@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net;
 
 namespace dzagar_SE3314_Assignment2
 {
@@ -22,16 +23,53 @@ namespace dzagar_SE3314_Assignment2
             //Add onClick events (defined in Controller) for each button
         }
 
-        //Get port number
+        //GET FUNCTIONS
 
-        //Get video file name
+        public int GetPortNo()      //Returns port number
+        {
+            return int.Parse(PortNumberTextBox.Text);
+        }
 
-        //Get server IP address text
+        public String GetVideoFilename()        //Get video file name
+        {
+            return VideoNameTextBox.Text;
+        }
 
-        //Add server request text
+        public IPAddress GetServIPAddr()        //Get server IP address text
+        {
+            return IPAddress.Parse(ServerIPAddressTextBox.Text);
+        }
 
-        //Add client activity text
+        //SET FUNCTIONS
 
-        //Show print header (true if checked, false if not)
+        public void AddServerRequestText(String serverText)        //Add server request text
+        {
+            if (InvokeRequired)     //required since we are multithreading
+            {
+                this.Invoke(new Action<string>(AddServerRequestText), new object[] { serverText });
+                return;
+            }
+            ServerActivityTextBox.Text += serverText;
+        }
+
+        public void AddClientActivityText(String clientText)        //Add client activity text
+        {
+            if (InvokeRequired)     //required since we are multithreading
+            {
+                this.Invoke(new Action<string>(AddClientActivityText), new object[] { clientText });
+                return;
+            }
+            ClientActivityTextBox.Text += clientText;
+        }
+
+        public bool ShowHeader()        //Show print header (true if checked, false if not)
+        {
+            return PrintHeaderCheckBox.Checked;
+        }
+
+        public bool ShowPacketReport()        //Show packet report (true if checked, false if not)
+        {
+            return PacketReportCheckBox.Checked;
+        }
     }
 }
