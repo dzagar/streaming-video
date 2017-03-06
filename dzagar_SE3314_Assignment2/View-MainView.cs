@@ -21,6 +21,7 @@ namespace dzagar_SE3314_Assignment2
             //Instantiate one instance of Controller
             _controller = new Controller();
             //Add onClick events (defined in Controller) for each button
+
         }
 
         //GET FUNCTIONS
@@ -70,6 +71,56 @@ namespace dzagar_SE3314_Assignment2
         public bool ShowPacketReport()        //Show packet report (true if checked, false if not)
         {
             return PacketReportCheckBox.Checked;
+        }
+
+        public void EnableButton(string name)
+        {
+            switch (name)
+            {
+                case "Connect":
+                    ConnectButton.Enabled = true;
+                    break;
+                case "Exit":
+                    ExitButton.Enabled = true;
+                    break;
+                case "Setup":
+                    SetupButton.Enabled = true;
+                    break;
+                case "Play":
+                    PlayButton.Enabled = true;
+                    break;
+                case "Pause":
+                    PauseButton.Enabled = true;
+                    break;
+                case "Teardown":
+                    TeardownButton.Enabled = true;
+                    break;
+            }
+        }
+
+        public void DisableButton(string name)
+        {
+            switch (name)
+            {
+                case "Connect":
+                    ConnectButton.Enabled = false;
+                    break;
+                case "Exit":
+                    ExitButton.Enabled = false;
+                    break;
+                case "Setup":
+                    SetupButton.Enabled = false;
+                    break;
+                case "Play":
+                    PlayButton.Enabled = false;
+                    break;
+                case "Pause":
+                    PauseButton.Enabled = false;
+                    break;
+                case "Teardown":
+                    TeardownButton.Enabled = false;
+                    break;
+            }
         }
     }
 }
