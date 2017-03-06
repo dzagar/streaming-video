@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
+using System.Net;
 
 namespace dzagar_SE3314_Assignment2
 {
@@ -13,6 +13,7 @@ namespace dzagar_SE3314_Assignment2
         private static View _view; //reference to main View
         RTSP _rtspModel = null;
         RTP _rtpModel = null;
+        String sessionNo = "";
 
         //Connect button click
         public void OnConnect(object sender, EventArgs e)
@@ -32,7 +33,13 @@ namespace dzagar_SE3314_Assignment2
         //Setup button click
         public void OnSetup(object sender, EventArgs e)
         {
-
+            _view = (View)((Button)sender).FindForm();
+            _rtspModel.SendServer("SETUP", GetPortNo(), GetVideoFilename(), GetServIPAddr(), 0);
+            String servResponse = _rtspModel.ListenServer();
+            UpdateServerActivity(ParseServerResponse(servResponse));
+            UpdateClientActivity("New RTSP State: READY\r\n");
+            _view.DisableButton("Setup");
+            _view.EnableButton("Play");
         }
 
         //Play button click
@@ -78,6 +85,37 @@ namespace dzagar_SE3314_Assignment2
             _rtspModel = new RTSP(_view.GetPortNo(), _view.GetServIPAddr());
             _rtspModel.ConnectServer();
             UpdateClientActivity("Client has connected to server.");
+        }
+
+        //Get port number
+        public int GetPortNo()
+        {
+            return _view.GetPortNo();
+        }
+
+        //Get video name
+        public string GetVideoFilename()
+        {
+            return _view.GetVideoFilename();
+        }
+
+        //Get Server IP
+        public IPAddress GetServIPAddr()
+        {
+            return _view.GetServIPAddr();
+        }
+
+        //Parse server response
+        public String ParseServerResponse(String msg)
+        {
+            msg = msg.Trim();
+            char[] delimiters = { ',', ':', ';', '/', '\n', '\r', ' ' };
+            String[] brokenMsg = msg.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+            sessionNo = brokenMsg[6];
+            msg = brokenMsg[0] + " " + brokenMsg[1] + " " + brokenMsg[2] + "\r\n";
+            msg += brokenMsg[3] + " " + brokenMsg[4] + "\r\n";
+            msg += brokenMsg[5] + " " + brokenMsg[6];
+            return msg;
         }
     }
 }

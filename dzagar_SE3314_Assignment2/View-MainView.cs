@@ -21,7 +21,12 @@ namespace dzagar_SE3314_Assignment2
             //Instantiate one instance of Controller
             _controller = new Controller();
             //Add onClick events (defined in Controller) for each button
-
+            ConnectButton.Click += new EventHandler(_controller.OnConnect);
+            ExitButton.Click += new EventHandler(_controller.OnExit);
+            SetupButton.Click += new EventHandler(_controller.OnSetup);
+            PlayButton.Click += new EventHandler(_controller.OnPlay);
+            PauseButton.Click += new EventHandler(_controller.OnPause);
+            TeardownButton.Click += new EventHandler(_controller.OnTeardown);
         }
 
         //GET FUNCTIONS
