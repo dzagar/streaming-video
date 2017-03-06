@@ -49,7 +49,7 @@ namespace dzagar_SE3314_Assignment2
             String[] msg = ParseServerResponse(servResponse);
             sessionNo = msg[6];
             UpdateServerActivity(FormatServerResponse(msg));
-            UpdateClientActivity("New RTSP State: READY\r\n");
+            UpdateClientActivity("New RTSP State: READY");
             _view.DisableButton("Setup");
             _view.DisableButton("VideoName");
             _view.EnableButton("Play");
@@ -73,7 +73,7 @@ namespace dzagar_SE3314_Assignment2
                 videoPlaybackThread.IsBackground = true;
                 videoPlaybackThread.Start();
             }
-            UpdateClientActivity("New RTSP State: PLAYING\r\n");
+            UpdateClientActivity("New RTSP State: PLAYING");
             _view.DisableButton("Play");
             _view.EnableButton("Pause");
             _view.EnableButton("Teardown");
@@ -91,7 +91,7 @@ namespace dzagar_SE3314_Assignment2
                 UpdateServerActivity(FormatServerResponse(msg));
             }
 
-            UpdateClientActivity("New RTSP State: PAUSED\r\n");
+            UpdateClientActivity("New RTSP State: PAUSED");
             _view.DisableButton("Pause");
             _view.EnableButton("Play");
         }
@@ -107,7 +107,7 @@ namespace dzagar_SE3314_Assignment2
             {
                 UpdateServerActivity(FormatServerResponse(msg));
             }
-            UpdateClientActivity("New RTSP State: TEARDOWN\r\n");
+            UpdateClientActivity("New RTSP State: TEARDOWN");
             _rtspModel.ResetSeqNum();
             _view.DisableButton("Play");
             _view.DisableButton("Pause");
@@ -147,11 +147,12 @@ namespace dzagar_SE3314_Assignment2
                 Buffer.BlockCopy(frameBytes, 0, header, 0, header.Length);
                 if (_view.ShowPacketReport())
                 {
-                    //figure this out
+                    
                 }
                 if (_view.ShowHeader())
                 {
-                    
+                    string bitHeader = string.Concat(header.Select(b => Convert.ToString(b, 2)));
+                    UpdateClientActivity(bitHeader);
                 }
                 _view.SetImage(frameImg);
             }
