@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -147,7 +148,12 @@ namespace dzagar_SE3314_Assignment2
                 Buffer.BlockCopy(frameBytes, 0, header, 0, header.Length);
                 if (_view.ShowPacketReport())
                 {
-                    
+                    int i = 1;
+                    int payloadType = header[i++] & 0x7f;
+                    int seqNo = header[i++] << 8 | header[i++];
+                    int timestamp = header[i++] << 24 | header[i++] << 16 | header[i++] << 8 | header[i++];
+                    string packetReport = "Got RTP packet with SeqNum #" + seqNo + " Timestamp " + timestamp + "ms, of type " + payloadType;
+                    UpdateClientActivity(packetReport);
                 }
                 if (_view.ShowHeader())
                 {
