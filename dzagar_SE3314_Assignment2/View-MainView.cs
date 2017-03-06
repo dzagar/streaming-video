@@ -38,7 +38,7 @@ namespace dzagar_SE3314_Assignment2
 
         public String GetVideoFilename()        //Get video file name
         {
-            return VideoNameTextBox.Text;
+            return VideoNameComboBox.Text;
         }
 
         public IPAddress GetServIPAddr()        //Get server IP address text
@@ -47,6 +47,21 @@ namespace dzagar_SE3314_Assignment2
         }
 
         //SET FUNCTIONS
+        public void SetImage(Image frame)       //Set to current frame
+        {
+            VideoImageBox.Image = frame;
+        }
+
+        public void EnableVideoView()
+        {
+            VideoGroupBox.Enabled = true;
+            VideoGroupBox.Visible = true;
+        }
+
+        public void ResetImage()        //Set to black
+        {
+            VideoImageBox.BackColor = Color.Black;
+        }
 
         public void AddServerRequestText(String serverText)        //Add server request text
         {
@@ -85,9 +100,6 @@ namespace dzagar_SE3314_Assignment2
                 case "Connect":
                     ConnectButton.Enabled = true;
                     break;
-                case "Exit":
-                    ExitButton.Enabled = true;
-                    break;
                 case "Setup":
                     SetupButton.Enabled = true;
                     break;
@@ -100,6 +112,9 @@ namespace dzagar_SE3314_Assignment2
                 case "Teardown":
                     TeardownButton.Enabled = true;
                     break;
+                case "VideoName":
+                    VideoNameComboBox.Enabled = true;
+                    break;
             }
         }
 
@@ -109,9 +124,6 @@ namespace dzagar_SE3314_Assignment2
             {
                 case "Connect":
                     ConnectButton.Enabled = false;
-                    break;
-                case "Exit":
-                    ExitButton.Enabled = false;
                     break;
                 case "Setup":
                     SetupButton.Enabled = false;
@@ -124,6 +136,9 @@ namespace dzagar_SE3314_Assignment2
                     break;
                 case "Teardown":
                     TeardownButton.Enabled = false;
+                    break;
+                case "VideoName":
+                    VideoNameComboBox.Enabled = false;
                     break;
             }
         }

@@ -26,6 +26,7 @@ namespace dzagar_SE3314_Assignment2
             _view = (View)((Button)sender).FindForm();
             _view.DisableButton("Connect");
             RTSPListen();
+            _view.EnableVideoView();
             _view.EnableButton("Setup");
         }
 
@@ -43,21 +44,23 @@ namespace dzagar_SE3314_Assignment2
         public void OnSetup(object sender, EventArgs e)
         {
             _view = (View)((Button)sender).FindForm();
-            _rtspModel.SendServer("SETUP", GetPortNo(), GetVideoFilename(), GetServIPAddr(), "no");
+            _rtspModel.SendServer("SETUP", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), "no");
             String servResponse = _rtspModel.ListenServer();
             String[] msg = ParseServerResponse(servResponse);
             sessionNo = msg[6];
             UpdateServerActivity(FormatServerResponse(msg));
             UpdateClientActivity("New RTSP State: READY\r\n");
             _view.DisableButton("Setup");
+            _view.DisableButton("VideoName");
             _view.EnableButton("Play");
+            _view.ResetImage();
         }
 
         //Play button click
         public void OnPlay(object sender, EventArgs e)
         {
             _view = (View)((Button)sender).FindForm();
-            _rtspModel.SendServer("PLAY", GetPortNo(), GetVideoFilename(), GetServIPAddr(), sessionNo);
+            _rtspModel.SendServer("PLAY", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
             String servResponse = _rtspModel.ListenServer();
             String[] msg = ParseServerResponse(servResponse);
             if (msg[0] == "RTSP/1.0")
@@ -80,13 +83,14 @@ namespace dzagar_SE3314_Assignment2
         public void OnPause(object sender, EventArgs e)
         {
             _view = (View)((Button)sender).FindForm();
-            _rtspModel.SendServer("PAUSE", GetPortNo(), GetVideoFilename(), GetServIPAddr(), sessionNo);
+            _rtspModel.SendServer("PAUSE", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
             String servResponse = _rtspModel.ListenServer();
             String[] msg = ParseServerResponse(servResponse);
             if (msg[0] == "RTSP/1.0")
             {
                 UpdateServerActivity(FormatServerResponse(msg));
             }
+
             UpdateClientActivity("New RTSP State: PAUSED\r\n");
             _view.DisableButton("Pause");
             _view.EnableButton("Play");
@@ -96,7 +100,7 @@ namespace dzagar_SE3314_Assignment2
         public void OnTeardown(object sender, EventArgs e)
         {
             _view = (View)((Button)sender).FindForm();
-            _rtspModel.SendServer("TEARDOWN", GetPortNo(), GetVideoFilename(), GetServIPAddr(), sessionNo);
+            _rtspModel.SendServer("TEARDOWN", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
             String servResponse = _rtspModel.ListenServer();
             String[] msg = ParseServerResponse(servResponse);
             if (msg[0] == "RTSP/1.0")
@@ -109,6 +113,7 @@ namespace dzagar_SE3314_Assignment2
             _view.DisableButton("Pause");
             _view.DisableButton("Teardown");
             _view.EnableButton("Setup");
+            _view.EnableButton("VideoName");
         }
 
         //Update server activity
@@ -126,7 +131,8 @@ namespace dzagar_SE3314_Assignment2
         //Video playback communications
         public void PlaybackCommunications()
         {
-            _rtpModel = new RTP(GetPortNo(), GetServIPAddr());
+            _rtpModel = new RTP(_view.GetPortNo(), _view.GetServIPAddr());
+            Image frameImg = null;
             //loop
             while (true)
             {
@@ -136,7 +142,7 @@ namespace dzagar_SE3314_Assignment2
                     _view.DisableButton("Pause");
                     break;
                 }
-                Image frameImg = _rtpModel.FrameToImage(frameBytes);
+                frameImg = _rtpModel.FrameToImage(frameBytes);
                 byte[] header = new byte[12];
                 Buffer.BlockCopy(frameBytes, 0, header, 0, header.Length);
                 if (_view.ShowPacketReport())
@@ -145,8 +151,9 @@ namespace dzagar_SE3314_Assignment2
                 }
                 if (_view.ShowHeader())
                 {
-                    //figure this out
+                    
                 }
+                _view.SetImage(frameImg);
             }
         }
 
@@ -154,34 +161,15 @@ namespace dzagar_SE3314_Assignment2
         public void RTSPListen()
         {
             UpdateClientActivity("Client is waiting patiently for a friend (server)...");
-            _rtspModel = new RTSP(GetPortNo(), GetServIPAddr());
+            _rtspModel = new RTSP(_view.GetPortNo(), _view.GetServIPAddr());
             _rtspModel.ConnectServer();
             UpdateClientActivity("Client has connected to server.");
-        }
-
-        //Get port number
-        public int GetPortNo()
-        {
-            return _view.GetPortNo();
-        }
-
-        //Get video name
-        public string GetVideoFilename()
-        {
-            return _view.GetVideoFilename();
-        }
-
-        //Get Server IP
-        public IPAddress GetServIPAddr()
-        {
-            return _view.GetServIPAddr();
         }
 
         //Parse server response
         public String[] ParseServerResponse(String msg)
         {
             msg = msg.Trim();
-            Console.WriteLine(msg);
             char[] delim = new char[0];
             String[] brokenMsg = msg.Split(delim, StringSplitOptions.RemoveEmptyEntries);
             return brokenMsg;
@@ -190,17 +178,7 @@ namespace dzagar_SE3314_Assignment2
         //Format server response
         public String FormatServerResponse(String[] msg)
         {
-            Console.WriteLine(msg[0]);
-            Console.WriteLine(msg[1]);
-            Console.WriteLine(msg[2]);
-            Console.WriteLine(msg[3]);
-            Console.WriteLine(msg[4]);
-            Console.WriteLine(msg[5]);
-            Console.WriteLine(msg[6]);
-            Console.WriteLine(msg[7]);
-            String resp = msg[0] + " " + msg[1] + " " + msg[2]
-                + "\r\n" + msg[3] + " " + msg[4] + "\r\n"
-                + msg[5] + " " + msg[6] + "\r\n";
+            String resp = msg[0] + " " + msg[1] + " " + msg[2] + "\r\n" + msg[3] + " " + msg[4] + "\r\n" + msg[5] + " " + msg[6] + "\r\n";
             return resp;
         }
     }
