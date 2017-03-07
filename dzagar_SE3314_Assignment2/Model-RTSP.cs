@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Windows.Forms;
 
 namespace dzagar_SE3314_Assignment2
 {
     class RTSP
     {
-        IPAddress ipAddrServ;
-        int portNo;
-        Socket RTSPSock = null;
-        Socket servSock = null;
-        IPEndPoint endPointServ;
-        int CSeqNum;
-        byte[] rcvBuffer;
+        IPAddress ipAddrServ;   //Server IP
+        int portNo; //Port number
+        Socket RTSPSock = null; //RTSP communication socket
+        IPEndPoint endPointServ;    //server endpoint
+        int CSeqNum;    //sequence number of msgs
+        byte[] rcvBuffer;   //Rcving buffer to send over RTSP
 
         //Constructor
         public RTSP(int port, IPAddress servIP)
         {
+            //Instantiate port num, server IP, sequence num, server endpoint, RTSP socket and buffer
             portNo = port;
             ipAddrServ = servIP;
             CSeqNum = 1;
@@ -30,17 +28,20 @@ namespace dzagar_SE3314_Assignment2
         }
 
         //Connect to server
-        public void ConnectServer()
+        public bool ConnectServer()
         {
             try
             {
-                RTSPSock.Connect(endPointServ);
+                RTSPSock.Connect(endPointServ); //Connect to endpoint
+                return true;
             } catch (SocketException e)
             {
+                //If exception thrown, close socket safely if not null
                 if (RTSPSock != null)
                 {
                     RTSPSock.Close();
                 }
+                return false;
             }
         }
 
@@ -49,6 +50,7 @@ namespace dzagar_SE3314_Assignment2
         {
             String portStr = port.ToString();
             String servIPStr = servIP.ToString();
+            //Craft message to be sent to server
             String msg = action + " rtsp://" + servIPStr + ":" + portStr + "/" + vidName + " RTSP/1.0\r\n" + "CSeq: " + CSeqNum + "\r\n";
             if (action == "SETUP" || sessionNo == "no")
             {
@@ -57,15 +59,14 @@ namespace dzagar_SE3314_Assignment2
             {
                 msg += "Session: " + sessionNo;
             }
+            //Increment sequence num of msgs
             CSeqNum++;
             try
             {
+                //Convert msg to bytes and send to server
                 rcvBuffer = Encoding.UTF8.GetBytes(msg);
                 RTSPSock.Send(rcvBuffer);
-            } catch (SocketException e)
-            {
-
-            }
+            } catch (SocketException e){}
         }
 
         //Listen to server
@@ -73,7 +74,9 @@ namespace dzagar_SE3314_Assignment2
         {
             try
             {
+                //Receive server message
                 int open = RTSPSock.Receive(rcvBuffer);
+                //If nothing received, close socket safely
                 if (open == 0)
                 {
                     RTSPSock.Close();
@@ -86,7 +89,7 @@ namespace dzagar_SE3314_Assignment2
             }
         }
 
-        //Reset sequence num
+        //Reset sequence num to 1
         public void ResetSeqNum()
         {
             CSeqNum = 1;

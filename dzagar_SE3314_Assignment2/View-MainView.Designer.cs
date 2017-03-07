@@ -53,7 +53,7 @@
             // 
             // PortNumberTextBox
             // 
-            this.PortNumberTextBox.Location = new System.Drawing.Point(177, 539);
+            this.PortNumberTextBox.Location = new System.Drawing.Point(179, 539);
             this.PortNumberTextBox.Name = "PortNumberTextBox";
             this.PortNumberTextBox.Size = new System.Drawing.Size(100, 31);
             this.PortNumberTextBox.TabIndex = 0;

@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 
@@ -13,7 +7,7 @@ namespace dzagar_SE3314_Assignment2
 {
     public partial class View : Form
     {
-        Controller _controller;
+        Controller _controller; //one instance of Controller
 
         public View()
         {
@@ -29,7 +23,7 @@ namespace dzagar_SE3314_Assignment2
             TeardownButton.Click += new EventHandler(_controller.OnTeardown);
         }
 
-        //GET FUNCTIONS
+        ///--------------GET FUNCTIONS--------------///
 
         public int GetPortNo()      //Returns port number
         {
@@ -46,21 +40,17 @@ namespace dzagar_SE3314_Assignment2
             return IPAddress.Parse(ServerIPAddressTextBox.Text);
         }
 
-        //SET FUNCTIONS
+        ///--------------SET FUNCTIONS--------------///
+
         public void SetImage(Image frame)       //Set to current frame
         {
             VideoImageBox.Image = frame;
         }
 
-        public void EnableVideoView()
+        public void EnableVideoView()   //Make video area visible and enabled
         {
             VideoGroupBox.Enabled = true;
             VideoGroupBox.Visible = true;
-        }
-
-        public void ResetImage()        //Set to black
-        {
-            VideoImageBox.BackColor = Color.Black;
         }
 
         public void AddServerRequestText(String serverText)        //Add server request text
@@ -93,7 +83,7 @@ namespace dzagar_SE3314_Assignment2
             return PacketReportCheckBox.Checked;
         }
 
-        public void EnableButton(string name)
+        public void EnableButton(string name)   //Switch through to enable appropriate button
         {
             switch (name)
             {
@@ -118,7 +108,7 @@ namespace dzagar_SE3314_Assignment2
             }
         }
 
-        public void DisableButton(string name)
+        public void DisableButton(string name)  //switch through to disable appropriate button
         {
             switch (name)
             {
