@@ -46,7 +46,7 @@ namespace dzagar_SE3314_Assignment2
         }
 
         //Send msg to server
-        public void SendServer(string action, int port, string vidName, IPAddress servIP, String sessionNo)
+        public bool SendServer(string action, int port, string vidName, IPAddress servIP, String sessionNo)
         {
             String portStr = port.ToString();
             String servIPStr = servIP.ToString();
@@ -66,7 +66,11 @@ namespace dzagar_SE3314_Assignment2
                 //Convert msg to bytes and send to server
                 rcvBuffer = Encoding.UTF8.GetBytes(msg);
                 RTSPSock.Send(rcvBuffer);
-            } catch (SocketException e){}
+                return true;
+            } catch (SocketException e){
+                Console.WriteLine("RTSP send failed");
+                return false;
+            }
         }
 
         //Listen to server

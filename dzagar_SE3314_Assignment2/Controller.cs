@@ -41,19 +41,32 @@ namespace dzagar_SE3314_Assignment2
         {
             _view = (View)((Button)sender).FindForm();
             //Send server SETUP message in appropriate format
-            _rtspModel.SendServer("SETUP", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), "no");
-            //Listen for server response on RTSP and parse response
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            sessionNo = msg[6];
-            //Update server and client activity boxes with server message and client prompt
-            UpdateServerActivity(FormatServerResponse(msg));
-            UpdateClientActivity("New RTSP State: READY");
-            //Disable Setup, editing of the video filename
-            _view.DisableButton("Setup");
-            _view.DisableButton("VideoName");
-            //Enable Play
-            _view.EnableButton("Play");
+            bool success = _rtspModel.SendServer("SETUP", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), "no");
+            if (success)
+            {
+                //Listen for server response on RTSP and parse response
+                String servResponse = _rtspModel.ListenServer();
+                String[] msg = ParseServerResponse(servResponse);
+                sessionNo = msg[6];
+                //Update server and client activity boxes with server message and client prompt
+                UpdateServerActivity(FormatServerResponse(msg));
+                UpdateClientActivity("New RTSP State: READY");
+                //Disable Setup, editing of the video filename
+                _view.DisableButton("Setup");
+                _view.DisableButton("VideoName");
+                //Enable Play
+                _view.EnableButton("Play");
+            } else
+            {
+                UpdateClientActivity("Server has disconnected. Please try again...");
+                _view.DisableButton("Setup");
+                _view.DisableButton("Play");
+                _view.DisableButton("Pause");
+                _view.DisableButton("Teardown");
+                _view.DisableVideoView();
+                _view.EnableButton("Connect");
+                _view.EnableButton("VideoName");
+            }
         }
 
         //Play button click
@@ -61,29 +74,42 @@ namespace dzagar_SE3314_Assignment2
         {
             _view = (View)((Button)sender).FindForm();
             //Send server PLAY message in appropriate format
-            _rtspModel.SendServer("PLAY", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
-            //Listen for server response on RTSP and parse response
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            //If the rcvd message is over appropriate protocol, update server activity with msg
-            if (msg[0] == "RTSP/1.0")
+            bool success = _rtspModel.SendServer("PLAY", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
+            if (success)
             {
-                UpdateServerActivity(FormatServerResponse(msg));
-            }
-            //If the video playback thread does not exist, create and start it in background
-            if (videoPlaybackThread == null)
+                //Listen for server response on RTSP and parse response
+                String servResponse = _rtspModel.ListenServer();
+                String[] msg = ParseServerResponse(servResponse);
+                //If the rcvd message is over appropriate protocol, update server activity with msg
+                if (msg[0] == "RTSP/1.0")
+                {
+                    UpdateServerActivity(FormatServerResponse(msg));
+                }
+                //If the video playback thread does not exist, create and start it in background
+                if (videoPlaybackThread == null)
+                {
+                    videoPlaybackThread = new Thread(PlaybackCommunications);
+                    videoPlaybackThread.IsBackground = true;
+                    videoPlaybackThread.Start();
+                }
+                //Update client activity with prompt
+                UpdateClientActivity("New RTSP State: PLAYING");
+                //Disable Play button
+                _view.DisableButton("Play");
+                //Enable Pause and Teardown btns
+                _view.EnableButton("Pause");
+                _view.EnableButton("Teardown");
+            } else
             {
-                videoPlaybackThread = new Thread(PlaybackCommunications);
-                videoPlaybackThread.IsBackground = true;
-                videoPlaybackThread.Start();
+                UpdateClientActivity("Server has disconnected. Please try again...");
+                _view.DisableButton("Setup");
+                _view.DisableButton("Play");
+                _view.DisableButton("Pause");
+                _view.DisableButton("Teardown");
+                _view.DisableVideoView();
+                _view.EnableButton("Connect");
+                _view.EnableButton("VideoName");
             }
-            //Update client activity with prompt
-            UpdateClientActivity("New RTSP State: PLAYING");
-            //Disable Play button
-            _view.DisableButton("Play");
-            //Enable Pause and Teardown btns
-            _view.EnableButton("Pause");
-            _view.EnableButton("Teardown");
         }
 
         //Pause button click
@@ -91,20 +117,34 @@ namespace dzagar_SE3314_Assignment2
         {
             _view = (View)((Button)sender).FindForm();
             //Send server PAUSE message in appropriate format
-            _rtspModel.SendServer("PAUSE", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
-            //Listen for server response on RTSP and parse response
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            //If the rcvd message is over appropriate protocol, update server activity with msg
-            if (msg[0] == "RTSP/1.0")
+            bool success = _rtspModel.SendServer("PAUSE", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
+            if (success)
             {
-                UpdateServerActivity(FormatServerResponse(msg));
+                //Listen for server response on RTSP and parse response
+                String servResponse = _rtspModel.ListenServer();
+                String[] msg = ParseServerResponse(servResponse);
+                //If the rcvd message is over appropriate protocol, update server activity with msg
+                if (msg[0] == "RTSP/1.0")
+                {
+                    UpdateServerActivity(FormatServerResponse(msg));
+                }
+                //Update client activity with prompt
+                UpdateClientActivity("New RTSP State: PAUSED");
+                //Disable Pause, Enable Play
+                _view.DisableButton("Pause");
+                _view.EnableButton("Play");
+            } else
+            {
+                //Server disconnected; update client
+                UpdateClientActivity("Server has disconnected. Please try again...");
+                _view.DisableButton("Setup");
+                _view.DisableButton("Play");
+                _view.DisableButton("Pause");
+                _view.DisableButton("Teardown");
+                _view.DisableVideoView();
+                _view.EnableButton("Connect");
+                _view.EnableButton("VideoName");
             }
-            //Update client activity with prompt
-            UpdateClientActivity("New RTSP State: PAUSED");
-            //Disable Pause, Enable Play
-            _view.DisableButton("Pause");
-            _view.EnableButton("Play");
         }
 
         //Teardown button click
@@ -112,24 +152,37 @@ namespace dzagar_SE3314_Assignment2
         {
             _view = (View)((Button)sender).FindForm();
             //Send server TEARDOWN message in appropriate format
-            _rtspModel.SendServer("TEARDOWN", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
-            //Listen for server response on RTSP and parse response
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            //If the rcvd message is over appropriate protocol, update server activity with msg
-            if (msg[0] == "RTSP/1.0")
+            bool success = _rtspModel.SendServer("TEARDOWN", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
+            if (success)
             {
-                UpdateServerActivity(FormatServerResponse(msg));
+                //Listen for server response on RTSP and parse response
+                String servResponse = _rtspModel.ListenServer();
+                String[] msg = ParseServerResponse(servResponse);
+                //If the rcvd message is over appropriate protocol, update server activity with msg
+                if (msg[0] == "RTSP/1.0")
+                {
+                    UpdateServerActivity(FormatServerResponse(msg));
+                }
+                //Update client activity with prompt
+                UpdateClientActivity("New RTSP State: TEARDOWN");
+                //Reset sequence number to 1, disable all buttons except Setup and video filename
+                _rtspModel.ResetSeqNum();
+                _view.DisableButton("Play");
+                _view.DisableButton("Pause");
+                _view.DisableButton("Teardown");
+                _view.EnableButton("Setup");
+                _view.EnableButton("VideoName");
+            } else {
+                //Server disconnected; update client
+                UpdateClientActivity("Server has disconnected. Please try again...");
+                _view.DisableButton("Setup");
+                _view.DisableButton("Play");
+                _view.DisableButton("Pause");
+                _view.DisableButton("Teardown");
+                _view.DisableVideoView();
+                _view.EnableButton("Connect");
+                _view.EnableButton("VideoName");
             }
-            //Update client activity with prompt
-            UpdateClientActivity("New RTSP State: TEARDOWN");
-            //Reset sequence number to 1, disable all buttons except Setup and video filename
-            _rtspModel.ResetSeqNum();
-            _view.DisableButton("Play");
-            _view.DisableButton("Pause");
-            _view.DisableButton("Teardown");
-            _view.EnableButton("Setup");
-            _view.EnableButton("VideoName");
         }
 
         ///--------------PROTOCOL FUNCTIONS--------------///

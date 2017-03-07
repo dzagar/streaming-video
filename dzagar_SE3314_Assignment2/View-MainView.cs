@@ -53,6 +53,13 @@ namespace dzagar_SE3314_Assignment2
             VideoGroupBox.Visible = true;
         }
 
+        public void DisableVideoView()   //Make video area invisible and disabled
+        {
+            VideoGroupBox.Enabled = false;
+            VideoGroupBox.Visible = false;
+            VideoImageBox.Image = null;
+        }
+
         public void AddServerRequestText(String serverText)        //Add server request text
         {
             if (InvokeRequired)     //required since we are multithreading
