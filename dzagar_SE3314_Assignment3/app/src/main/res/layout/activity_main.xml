@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:background="@android:color/holo_blue_dark"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.danazagar.dzagar_se3314_assignment3.MainActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        app:srcCompat="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/videoImageView" />
+
+    <Button
+        android:text="SETUP"
+        android:layout_width="wrap_content"
+        android:layout_height="75sp"
+        android:layout_below="@+id/videoImageView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/setupBtn"
+        android:textSize="10sp" />
+
+    <Button
+        android:text="PLAY"
+        android:layout_width="wrap_content"
+        android:layout_height="75sp"
+        android:layout_below="@+id/videoImageView"
+        android:layout_toRightOf="@+id/setupBtn"
+        android:layout_toEndOf="@+id/setupBtn"
+        android:id="@+id/playBtn"
+        android:textSize="10sp" />
+
+    <Button
+        android:text="PAUSE"
+        android:layout_width="wrap_content"
+        android:layout_height="75sp"
+        android:layout_below="@+id/videoImageView"
+        android:layout_toRightOf="@+id/playBtn"
+        android:layout_toEndOf="@+id/playBtn"
+        android:id="@+id/pauseBtn"
+        android:textSize="10sp" />
+
+    <Button
+        android:text="TEARDOWN"
+        android:layout_width="wrap_content"
+        android:layout_height="75sp"
+        android:layout_below="@+id/videoImageView"
+        android:layout_toRightOf="@+id/pauseBtn"
+        android:layout_toEndOf="@+id/pauseBtn"
+        android:id="@+id/teardownBtn"
+        android:textSize="10sp" />
+
+    <EditText
+        android:ems="10"
+        android:id="@+id/serverIPText"
+        android:layout_width="200dp"
+        android:inputType="text"
+        android:background="@android:color/background_light"
+        android:layout_height="40dp"
+        android:layout_above="@+id/connectBtn"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="10dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:background="@android:color/background_light"
+        android:layout_alignTop="@+id/serverIPText"
+        android:layout_toRightOf="@+id/serverIPText"
+        android:layout_toEndOf="@+id/serverIPText"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:id="@+id/portNoText"
+        android:inputType="text"
+        android:layout_alignBottom="@+id/serverIPText" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/portNoText"
+        android:id="@+id/videoNameDropdown"
+        android:background="@android:color/background_light"
+        android:layout_toLeftOf="@+id/portNoText"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@+id/connectBtn" />
+
+    <Button
+        android:text="CONNECT"
+        android:layout_width="125dp"
+        android:id="@+id/connectBtn"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
