@@ -218,8 +218,11 @@ public class ClientController{
     {
         //Trim message, split and return string array
         msg = msg.trim();
-        String[] brokenMsg = msg.split("\r\n");
-        return brokenMsg[2];
+        String[] brokenMsg = msg.split("\\s+");
+        for (int i = 0; i < brokenMsg.length; i++){
+            Log.d("STRINGARR", brokenMsg[i]);
+        }
+        return brokenMsg[6];
     }
 
 
