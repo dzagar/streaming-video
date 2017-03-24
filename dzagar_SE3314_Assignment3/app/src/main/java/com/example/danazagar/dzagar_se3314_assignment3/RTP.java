@@ -3,8 +3,10 @@ package com.example.danazagar.dzagar_se3314_assignment3;
 /**
  * Created by danazagar on 2017-03-23.
  */
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -15,7 +17,7 @@ import java.net.SocketException;
 
 public class RTP {
     InetSocketAddress endPointServ;
-    DatagramSocket framesFromServCli;
+    DatagramSocket framesFromServCli = null;
     RTPPacket _rtpPacket = null;
 
     public RTP (int port, InetAddress servIP){
@@ -23,6 +25,7 @@ public class RTP {
         try {
             framesFromServCli = new DatagramSocket(25000);
         } catch (SocketException e){
+            Log.d("RTP", "Frame socket null");
             framesFromServCli = null;
         }
         _rtpPacket = new RTPPacket();
@@ -32,12 +35,16 @@ public class RTP {
 
         try {
             int length = framesFromServCli.getReceiveBufferSize();
+            Log.d("RTP", "Buffer size: " + length);
             byte[] vidFramePkt = new byte[length];
             DatagramPacket pkt = new DatagramPacket(vidFramePkt, vidFramePkt.length);
+            pkt.setData(vidFramePkt);
             framesFromServCli.receive(pkt);
             if (vidFramePkt.length > 0){
+                Log.d("RTP", "Returning video frame bytes");
                 return vidFramePkt;
             } else {
+                Log.d("RTP", "Not returning shit");
                 return null;
             }
         } catch (SocketException e){

@@ -2,6 +2,9 @@ package com.example.danazagar.dzagar_se3314_assignment3;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.util.Log;
+
 /**
  * Created by danazagar on 2017-03-23.
  */
@@ -14,13 +17,45 @@ public class ClientController{
     Thread videoPlaybackThread = null;
     byte[] frameBytes;
 
-    public ClientController(MainActivity view){
+    Handler uiHandler;
+
+    public ClientController(MainActivity view, Handler mHandler){
         _view = view;
+        uiHandler = mHandler;
     }
 
     public void OnConnect(){
-        _view.DisableButton("Connect");
-        RTSPListen();
+        AsyncTask<Void, Void, Boolean> connectServer = new AsyncTask<Void, Void, Boolean>(){
+            @Override
+            protected void onPreExecute(){
+                _view.DisableButton("Connect");
+                Log.d("CONNECT", "calling RTSPListen");
+            }
+            @Override
+            protected Boolean doInBackground(Void... params){
+                Log.d("CONNECT", "Port no: " + _view.GetPortNo() + " ServIP: " + _view.GetServIPAddr().toString());
+                _rtspModel = new RTSP(_view.GetPortNo(), _view.GetServIPAddr());
+                boolean success = _rtspModel.ConnectServer();
+                return success;
+            }
+            @Override
+            protected void onPostExecute(Boolean result){
+                if (result)
+                {
+                    Log.d("CONNECT", "post execute worked");
+                    _view.EnableVideoView();    //Enable video area with controls
+                    _view.EnableButton("Setup");    //Enable Setup btn
+                }
+                else //if server is not connected
+                {
+                    //Reenable Connect to allow user to try again
+                    Log.d("CONNECT", "post execute got false");
+                    _view.EnableButton("Connect");
+                }
+            }
+        };
+        connectServer.execute();
+
     }
 
     public void OnExit(){
@@ -31,126 +66,134 @@ public class ClientController{
     }
 
     public void OnSetup(){
-        boolean success = _rtspModel.SendServer("SETUP", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), "no");
-        if (success){
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            sessionNo = msg[6];
-            _view.DisableButton("Setup");
-            _view.DisableButton("VideoName");
-            _view.EnableButton("Play");
-        } else {
-            _view.DisableButton("Setup");
-            _view.DisableButton("Play");
-            _view.DisableButton("Pause");
-            _view.DisableButton("Teardown");
-            _view.DisableVideoView();
-            _view.EnableButton("Connect");
-            _view.EnableButton("VideoName");
-        }
+        AsyncTask<Void, Void, Boolean> setup = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                Log.d("SETUP","entered do in bg");
+                boolean success = _rtspModel.SendServer("SETUP", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), "no");
+                String response = _rtspModel.ListenServer();
+                sessionNo = GetServerSessionNo(response);
+                Log.d("SETUP", "Session: " + sessionNo);
+                return success;
+            }
+            @Override
+            protected void onPostExecute(Boolean result){
+                if (result){
+                    Log.d("SETUP", "setup success");
+                    _view.DisableButton("Setup");
+                    _view.DisableButton("VideoName");
+                    _view.EnableButton("Play");
+                } else {
+                    _view.DisableButton("Setup");
+                    _view.DisableButton("Play");
+                    _view.DisableButton("Pause");
+                    _view.DisableButton("Teardown");
+                    _view.DisableVideoView();
+                    _view.EnableButton("Connect");
+                    _view.EnableButton("VideoName");
+                }
+            }
+        };
+        setup.execute();
     }
 
     public void OnPlay(){
-        boolean success = _rtspModel.SendServer("PLAY", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
-        if (success){
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            if (videoPlaybackThread == null)
-            {
-                videoPlaybackThread = new Thread(new PlaybackCommunications());
-                videoPlaybackThread.start();
+        AsyncTask<Void, Void, Boolean> play = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                boolean success = _rtspModel.SendServer("PLAY", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
+                return success;
             }
-            _view.DisableButton("Play");
-            _view.EnableButton("Pause");
-            _view.EnableButton("Teardown");
-        } else {
-            _view.DisableButton("Setup");
-            _view.DisableButton("Play");
-            _view.DisableButton("Pause");
-            _view.DisableButton("Teardown");
-            _view.DisableVideoView();
-            _view.EnableButton("Connect");
-            _view.EnableButton("VideoName");
-        }
+            @Override
+            protected void onPostExecute(Boolean result){
+                if (result){
+                    if (videoPlaybackThread == null)
+                    {
+                        Log.d("PLAY", "Gonna start new thread");
+                        videoPlaybackThread = new Thread(new PlaybackCommunications());
+                        videoPlaybackThread.start();
+                    }
+                    _view.DisableButton("Play");
+                    _view.EnableButton("Pause");
+                    _view.EnableButton("Teardown");
+                } else {
+                    _view.DisableButton("Setup");
+                    _view.DisableButton("Play");
+                    _view.DisableButton("Pause");
+                    _view.DisableButton("Teardown");
+                    _view.DisableVideoView();
+                    _view.EnableButton("Connect");
+                    _view.EnableButton("VideoName");
+                }
+            }
+        };
+        play.execute();
     }
 
     public void OnPause(){
-        boolean success = _rtspModel.SendServer("PAUSE", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
-        if(success){
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            _view.DisableButton("Pause");
-            _view.EnableButton("Play");
-        } else {
-            _view.DisableButton("Setup");
-            _view.DisableButton("Play");
-            _view.DisableButton("Pause");
-            _view.DisableButton("Teardown");
-            _view.DisableVideoView();
-            _view.EnableButton("Connect");
-            _view.EnableButton("VideoName");
-        }
+        AsyncTask<Void, Void, Boolean> pause = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                boolean success = _rtspModel.SendServer("PAUSE", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
+                return success;
+            }
+            @Override
+            protected void onPostExecute(Boolean result){
+                if(result){
+                    _view.DisableButton("Pause");
+                    _view.EnableButton("Play");
+                } else {
+                    _view.DisableButton("Setup");
+                    _view.DisableButton("Play");
+                    _view.DisableButton("Pause");
+                    _view.DisableButton("Teardown");
+                    _view.DisableVideoView();
+                    _view.EnableButton("Connect");
+                    _view.EnableButton("VideoName");
+                }
+            }
+        };
+        pause.execute();
     }
 
     public void OnTeardown(){
-        boolean success = _rtspModel.SendServer("TEARDOWN", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
-        if(success){
-            String servResponse = _rtspModel.ListenServer();
-            String[] msg = ParseServerResponse(servResponse);
-            _rtspModel.ResetSeqNum();
-            _view.DisableButton("Play");
-            _view.DisableButton("Pause");
-            _view.DisableButton("Teardown");
-            _view.EnableButton("Setup");
-            _view.EnableButton("VideoName");
-        } else {
-            _view.DisableButton("Setup");
-            _view.DisableButton("Play");
-            _view.DisableButton("Pause");
-            _view.DisableButton("Teardown");
-            _view.DisableVideoView();
-            _view.EnableButton("Connect");
-            _view.EnableButton("VideoName");
-        }
+        AsyncTask<Void, Void, Boolean> teardown = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                boolean success = _rtspModel.SendServer("TEARDOWN", _view.GetPortNo(), _view.GetVideoFilename(), _view.GetServIPAddr(), sessionNo);
+                return success;
+            }
+            @Override
+            protected void onPostExecute(Boolean result){
+                if(result){
+                    _rtspModel.ResetSeqNum();
+                    _view.DisableButton("Play");
+                    _view.DisableButton("Pause");
+                    _view.DisableButton("Teardown");
+                    _view.EnableButton("Setup");
+                    _view.EnableButton("VideoName");
+                } else {
+                    _view.DisableButton("Setup");
+                    _view.DisableButton("Play");
+                    _view.DisableButton("Pause");
+                    _view.DisableButton("Teardown");
+                    _view.DisableVideoView();
+                    _view.EnableButton("Connect");
+                    _view.EnableButton("VideoName");
+                }
+            }
+        };
+        teardown.execute();
     }
 
     public void OnVideoTap(){
 
     }
 
-    private void RTSPListen(){
-        _rtspModel = new RTSP(_view.GetPortNo(), _view.GetServIPAddr());
-        AsyncTask<Void, Void, Void> connectServer = new AsyncTask<Void, Void, Void>(){
-            @Override
-            protected Void doInBackground(Void... params){
-                boolean success = _rtspModel.ConnectServer();
-                if (success)
-                {
-                    _view.EnableVideoView();    //Enable video area with controls
-                    _view.EnableButton("Setup");    //Enable Setup btn
-                    return null;
-                }
-                else //if server is not connected
-                {
-                    //Reenable Connect to allow user to try again
-                    _view.EnableButton("Connect");
-                    return null;
-                }
-            }
-        };
-    }
-
-    private String[] ParseServerResponse(String msg){
-        return new String[1];
-    }
-
-    private String FormatServerResponse(String[] msg){
-        return new String();
-    }
-
     private class PlaybackCommunications implements Runnable {
         public void run(){
             _rtpModel = new RTP(_view.GetPortNo(), _view.GetServIPAddr());
+            Log.d("PC", "RUNNING RUNNABLE");
             Bitmap frameImg = null;
             while (true)
             {
@@ -168,6 +211,15 @@ public class ClientController{
                 _view.SetImage(frameImg);
             }
         }
+    }
+
+    //Parse server response
+    public String GetServerSessionNo(String msg)
+    {
+        //Trim message, split and return string array
+        msg = msg.trim();
+        String[] brokenMsg = msg.split("\r\n");
+        return brokenMsg[2];
     }
 
 

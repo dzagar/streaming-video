@@ -21,6 +21,7 @@
 
     <Button
         android:text="SETUP"
+        android:enabled="false"
         android:layout_width="wrap_content"
         android:layout_height="75sp"
         android:layout_below="@+id/videoImageView"
@@ -31,6 +32,7 @@
 
     <Button
         android:text="PLAY"
+        android:enabled="false"
         android:layout_width="wrap_content"
         android:layout_height="75sp"
         android:layout_below="@+id/videoImageView"
@@ -41,6 +43,7 @@
 
     <Button
         android:text="PAUSE"
+        android:enabled="false"
         android:layout_width="wrap_content"
         android:layout_height="75sp"
         android:layout_below="@+id/videoImageView"
@@ -51,6 +54,7 @@
 
     <Button
         android:text="TEARDOWN"
+        android:enabled="false"
         android:layout_width="wrap_content"
         android:layout_height="75sp"
         android:layout_below="@+id/videoImageView"

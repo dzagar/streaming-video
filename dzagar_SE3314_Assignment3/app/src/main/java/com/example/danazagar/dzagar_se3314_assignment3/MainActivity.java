@@ -2,7 +2,9 @@ package com.example.danazagar.dzagar_se3314_assignment3;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         portNoText = (EditText) findViewById(R.id.portNoText);
         videoDropdown = (Spinner) findViewById(R.id.videoNameDropdown);
 
-        _controller = new ClientController(this);
+        _controller = new ClientController(this, new Handler());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, videoNames);
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             _controller.OnConnect();
         });
         setupBtn.setOnClickListener(e -> {
+            Log.d("MAIN", "clicked setup");
             _controller.OnSetup();
         });
         playBtn.setOnClickListener(e -> {

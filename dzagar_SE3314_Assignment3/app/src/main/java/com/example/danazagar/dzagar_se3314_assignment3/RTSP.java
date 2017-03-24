@@ -1,12 +1,8 @@
 package com.example.danazagar.dzagar_se3314_assignment3;
 
-import android.os.AsyncTask;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -63,41 +59,26 @@ public class RTSP {
         CSeqNum++;
         try {
             rcvBuffer = msg.getBytes();
-            OutputStream os = RTSPSock.getOutputStream();
-            DataOutputStream dos = new DataOutputStream(os);
-            dos.writeInt(rcvBuffer.length);
-            if (rcvBuffer.length > 0){
-                dos.write(rcvBuffer, 0, rcvBuffer.length);
-                return true;
-            }
-            return false;
+            DataOutputStream dos = new DataOutputStream(RTSPSock.getOutputStream());
+            dos.write(rcvBuffer);
+            return true;
         } catch (IOException e){
             return false;
-        }
-    }
-
-    public String ListenServer(){
-        try {
-            InputStream is = RTSPSock.getInputStream();
-            DataInputStream dis = new DataInputStream(is);
-            int length = dis.readInt();
-            if (length > 0){
-                dis.readFully(rcvBuffer);
-                return new String(rcvBuffer, "UTF-8");
-            } else {
-                try {
-                    RTSPSock.close();
-                    return "Error: no byte transfer";
-                } catch (IOException f){
-                    return "Error: RTSPSock will not close";
-                }
-            }
-        } catch (IOException e){
-            return "Error on socket";
         }
     }
 
     public void ResetSeqNum(){
         CSeqNum = 1;
+    }
+
+    public String ListenServer()
+    {
+        try {
+            DataInputStream dis = new DataInputStream(RTSPSock.getInputStream());
+            dis.read(rcvBuffer);
+            return new String(rcvBuffer,"UTF-8");
+        } catch (IOException e){
+            return "Error on socket";
+        }
     }
 }
