@@ -39,7 +39,7 @@ public class RTP {
             byte[] vidFramePkt = new byte[length];
             DatagramPacket pkt = new DatagramPacket(vidFramePkt, vidFramePkt.length);
             pkt.setData(vidFramePkt);
-            framesFromServCli.receive(pkt);
+            framesFromServCli.receive(pkt); //hangs here
             if (vidFramePkt.length > 0){
                 Log.d("RTP", "Returning video frame bytes");
                 return vidFramePkt;
@@ -57,7 +57,7 @@ public class RTP {
     public Bitmap FrameToImage(byte[] frame){
         byte[] vidFramePkt = _rtpPacket.UnpackFrame(frame);
         try {
-            Bitmap bmp = BitmapFactory.decodeByteArray(frame, 0, frame.length);
+            Bitmap bmp = BitmapFactory.decodeByteArray(vidFramePkt, 0, vidFramePkt.length);
             return bmp;
         } catch (Exception e){
             return null;

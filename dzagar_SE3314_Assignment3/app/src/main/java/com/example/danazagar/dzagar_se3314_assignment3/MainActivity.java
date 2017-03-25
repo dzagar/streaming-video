@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import java.net.InetAddress;
@@ -26,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private EditText portNoText;
     private Spinner videoDropdown;
     private Button connectBtn;
+    private LinearLayout imageBtns;
+    private ImageButton setupImgBtn;
+    private ImageButton playImgBtn;
+    private ImageButton pauseImgBtn;
+    private ImageButton teardownImgBtn;
     private ClientController _controller;
 
     private String[] videoNames = {"video1.mjpeg","video2.mjpeg","video3.mjpeg"};
@@ -45,6 +53,11 @@ public class MainActivity extends AppCompatActivity {
         serverIPText = (EditText) findViewById(R.id.serverIPText);
         portNoText = (EditText) findViewById(R.id.portNoText);
         videoDropdown = (Spinner) findViewById(R.id.videoNameDropdown);
+        imageBtns = (LinearLayout) findViewById(R.id.imageButtons);
+        setupImgBtn = (ImageButton) findViewById(R.id.setupImgBtn);
+        playImgBtn = (ImageButton) findViewById(R.id.playImgBtn);
+        pauseImgBtn = (ImageButton) findViewById(R.id.pauseImgBtn);
+        teardownImgBtn = (ImageButton) findViewById(R.id.teardownImgBtn);
 
         _controller = new ClientController(this, new Handler());
 
@@ -56,16 +69,27 @@ public class MainActivity extends AppCompatActivity {
             _controller.OnConnect();
         });
         setupBtn.setOnClickListener(e -> {
-            Log.d("MAIN", "clicked setup");
+            _controller.OnSetup();
+        });
+        setupImgBtn.setOnClickListener(e -> {
             _controller.OnSetup();
         });
         playBtn.setOnClickListener(e -> {
             _controller.OnPlay();
         });
+        playImgBtn.setOnClickListener(e -> {
+            _controller.OnPlay();
+        });
         pauseBtn.setOnClickListener(e -> {
             _controller.OnPause();
         });
+        pauseImgBtn.setOnClickListener(e -> {
+            _controller.OnPause();
+        });
         teardownBtn.setOnClickListener(e -> {
+            _controller.OnTeardown();
+        });
+        teardownImgBtn.setOnClickListener(e -> {
             _controller.OnTeardown();
         });
         ivDisplay.setOnClickListener(e -> {
@@ -98,7 +122,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void ShowHoverIcons(){
+        imageBtns.setVisibility(View.VISIBLE);
+    }
+    public void HideHoverIcons(){
+        imageBtns.setVisibility(View.INVISIBLE);
+    }
+
     public void SetImage(Bitmap frame){
+        Log.d("MAIN", "Entered set image");
         ivDisplay.setImageBitmap(frame);
     }
 
@@ -121,15 +153,23 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "Setup":
                 setupBtn.setEnabled(true);
+                setupImgBtn.setEnabled(true);
+                setupImgBtn.setVisibility(View.VISIBLE);
                 break;
             case "Play":
                 playBtn.setEnabled(true);
+                playImgBtn.setEnabled(true);
+                playImgBtn.setVisibility(View.VISIBLE);
                 break;
             case "Pause":
                 pauseBtn.setEnabled(true);
+                pauseImgBtn.setEnabled(true);
+                pauseImgBtn.setVisibility(View.VISIBLE);
                 break;
             case "Teardown":
                 teardownBtn.setEnabled(true);
+                teardownImgBtn.setEnabled(true);
+                teardownImgBtn.setVisibility(View.VISIBLE);
                 break;
             case "VideoName":
                 videoDropdown.setEnabled(true);
@@ -145,15 +185,23 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "Setup":
                 setupBtn.setEnabled(false);
+                setupImgBtn.setEnabled(false);
+                setupImgBtn.setVisibility(View.GONE);
                 break;
             case "Play":
                 playBtn.setEnabled(false);
+                playImgBtn.setEnabled(false);
+                playImgBtn.setVisibility(View.GONE);
                 break;
             case "Pause":
                 pauseBtn.setEnabled(false);
+                pauseImgBtn.setEnabled(false);
+                pauseImgBtn.setVisibility(View.GONE);
                 break;
             case "Teardown":
                 teardownBtn.setEnabled(false);
+                teardownImgBtn.setEnabled(false);
+                teardownImgBtn.setVisibility(View.GONE);
                 break;
             case "VideoName":
                 videoDropdown.setEnabled(false);

@@ -187,7 +187,16 @@ public class ClientController{
     }
 
     public void OnVideoTap(){
-
+        uiHandler.post(new Runnable(){
+            public void run(){
+                _view.ShowHoverIcons();
+            }
+        });
+        uiHandler.postDelayed(new Runnable(){
+            public void run(){
+                _view.HideHoverIcons();
+            }
+        }, 3000);
     }
 
     private class PlaybackCommunications implements Runnable {
@@ -219,9 +228,6 @@ public class ClientController{
         //Trim message, split and return string array
         msg = msg.trim();
         String[] brokenMsg = msg.split("\\s+");
-        for (int i = 0; i < brokenMsg.length; i++){
-            Log.d("STRINGARR", brokenMsg[i]);
-        }
         return brokenMsg[6];
     }
 

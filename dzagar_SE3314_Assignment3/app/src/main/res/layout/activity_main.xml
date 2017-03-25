@@ -15,98 +15,150 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="260dp"
-        app:srcCompat="@android:color/black"
+        android:enabled="false"
+        app:srcCompat="@null"
         android:layout_centerHorizontal="true"
-        android:id="@+id/videoImageView" />
-
-    <Button
-        android:text="SETUP"
-        android:enabled="false"
-        android:layout_width="wrap_content"
-        android:layout_height="75sp"
-        android:layout_below="@+id/videoImageView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/setupBtn"
-        android:textSize="10sp" />
-
-    <Button
-        android:text="PLAY"
-        android:enabled="false"
-        android:layout_width="wrap_content"
-        android:layout_height="75sp"
-        android:layout_below="@+id/videoImageView"
-        android:layout_toRightOf="@+id/setupBtn"
-        android:layout_toEndOf="@+id/setupBtn"
-        android:id="@+id/playBtn"
-        android:textSize="10sp" />
-
-    <Button
-        android:text="PAUSE"
-        android:enabled="false"
-        android:layout_width="wrap_content"
-        android:layout_height="75sp"
-        android:layout_below="@+id/videoImageView"
-        android:layout_toRightOf="@+id/playBtn"
-        android:layout_toEndOf="@+id/playBtn"
-        android:id="@+id/pauseBtn"
-        android:textSize="10sp" />
-
-    <Button
-        android:text="TEARDOWN"
-        android:enabled="false"
-        android:layout_width="wrap_content"
-        android:layout_height="75sp"
-        android:layout_below="@+id/videoImageView"
-        android:layout_toRightOf="@+id/pauseBtn"
-        android:layout_toEndOf="@+id/pauseBtn"
-        android:id="@+id/teardownBtn"
-        android:textSize="10sp" />
-
-    <EditText
-        android:ems="10"
-        android:id="@+id/serverIPText"
-        android:layout_width="200dp"
-        android:inputType="text"
-        android:background="@android:color/background_light"
-        android:layout_height="40dp"
-        android:layout_above="@+id/connectBtn"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="10dp" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:background="@android:color/background_light"
-        android:layout_alignTop="@+id/serverIPText"
-        android:layout_toRightOf="@+id/serverIPText"
-        android:layout_toEndOf="@+id/serverIPText"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:id="@+id/portNoText"
-        android:inputType="text"
-        android:layout_alignBottom="@+id/serverIPText" />
-
-    <Spinner
+        android:id="@+id/videoImageView"
+        android:background="@android:color/background_dark" />
+    <LinearLayout
+        android:id="@+id/imageButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/portNoText"
-        android:id="@+id/videoNameDropdown"
-        android:background="@android:color/background_light"
-        android:layout_toLeftOf="@+id/portNoText"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/connectBtn" />
+        android:layout_alignBottom="@+id/videoImageView"
+        android:layout_marginBottom="75dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="invisible">
+        <ImageButton
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:enabled="false"
+            android:padding="5dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/setup"
+            android:id="@+id/setupImgBtn"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
+            android:background="@null" />
+        <ImageButton
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:enabled="false"
+            android:padding="5dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/play"
+            android:id="@+id/playImgBtn"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
+            android:background="@null" />
+        <ImageButton
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:enabled="false"
+            android:padding="5dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/pause"
+            android:id="@+id/pauseImgBtn"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
+            android:background="@null" />
+        <ImageButton
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:enabled="false"
+            android:padding="5dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/teardown"
+            android:id="@+id/teardownImgBtn"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
+            android:background="@null" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/mainButtonLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/videoImageView"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <Button
+            android:text="SETUP"
+            android:enabled="false"
+            android:layout_width="80dp"
+            android:layout_height="75sp"
+            android:id="@+id/setupBtn"
+            android:textSize="10sp" />
 
-    <Button
-        android:text="CONNECT"
-        android:layout_width="125dp"
-        android:id="@+id/connectBtn"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        <Button
+            android:text="PLAY"
+            android:enabled="false"
+            android:layout_width="80dp"
+            android:layout_height="75sp"
+            android:id="@+id/playBtn"
+            android:textSize="10sp" />
+
+        <Button
+            android:text="PAUSE"
+            android:enabled="false"
+            android:layout_width="80dp"
+            android:layout_height="75sp"
+            android:id="@+id/pauseBtn"
+            android:textSize="10sp" />
+
+        <Button
+            android:text="TEARDOWN"
+            android:enabled="false"
+            android:layout_width="80dp"
+            android:layout_height="75sp"
+            android:id="@+id/teardownBtn"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id = "@+id/firstRowLL"
+        android:layout_below="@+id/mainButtonLL"
+        android:paddingTop="30dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+            <EditText
+                android:ems="10"
+                android:id="@+id/serverIPText"
+                android:layout_width="200dp"
+                android:inputType="text"
+                android:background="@android:color/background_light"
+                android:layout_height="40dp"
+                android:hint="Server IP"
+                android:textAlignment="center" />
+            <EditText
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:background="@android:color/background_light"
+                android:layout_marginLeft="16dp"
+                android:id="@+id/portNoText"
+                android:inputType="text"
+                android:hint="Port No"
+                android:textAlignment="center" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/firstRowLL"
+        android:paddingTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <Spinner
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:id="@+id/videoNameDropdown"
+            android:background="@android:color/background_light" />
+        <Button
+            android:text="CONNECT"
+            android:layout_width="125dp"
+            android:id="@+id/connectBtn"
+            android:layout_marginLeft="20dp"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_height="60dp" />
+    </LinearLayout>
 
 </RelativeLayout>
