@@ -200,10 +200,11 @@ public class ClientController{
     }
 
     private class PlaybackCommunications implements Runnable {
+        Bitmap frameImg = null;
         public void run(){
             _rtpModel = new RTP(_view.GetPortNo(), _view.GetServIPAddr());
             Log.d("PC", "RUNNING RUNNABLE");
-            Bitmap frameImg = null;
+            frameImg = null;
             while (true)
             {
                 //Get bytes of frame through RTP
@@ -216,8 +217,12 @@ public class ClientController{
                 }
                 //Create image from frame bytes
                 frameImg = _rtpModel.FrameToImage(frameBytes);
-                //Set video area to current frame
-                _view.SetImage(frameImg);
+                uiHandler.post(new Runnable(){
+                    public void run(){
+                        //Set video area to current frame
+                        _view.SetImage(frameImg);
+                    }
+                });
             }
         }
     }
