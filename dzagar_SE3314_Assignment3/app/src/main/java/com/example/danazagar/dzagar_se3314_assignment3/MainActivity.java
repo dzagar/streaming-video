@@ -20,21 +20,23 @@ import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView ivDisplay;
-    private Button setupBtn;
-    private Button playBtn;
-    private Button pauseBtn;
-    private Button teardownBtn;
-    private EditText serverIPText;
-    private EditText portNoText;
-    private Spinner videoDropdown;
-    private Button connectBtn;
-    private LinearLayout imageBtns;
-    private ImageButton setupImgBtn;
-    private ImageButton playImgBtn;
-    private ImageButton pauseImgBtn;
-    private ImageButton teardownImgBtn;
-    private ClientController _controller;
+    //References to View elements
+
+    private ImageView ivDisplay;    //video image display
+    private Button setupBtn;    //setup button
+    private Button playBtn;     //play button
+    private Button pauseBtn;    //pause button
+    private Button teardownBtn; //teardown button
+    private EditText serverIPText;  //server ip text field
+    private EditText portNoText;    //port number text field
+    private Spinner videoDropdown;  //video dropdown list
+    private Button connectBtn;      //connect server button
+    private LinearLayout imageBtns; //grouping of buttons over image display
+    private ImageButton setupImgBtn;    //setup image button
+    private ImageButton playImgBtn;     //play image button
+    private ImageButton pauseImgBtn;    //pause image button
+    private ImageButton teardownImgBtn; //teardown image btuton
+    private ClientController _controller;   //one instance of controller
 
     private String[] videoNames = {"video1.mjpeg","video2.mjpeg","video3.mjpeg"};
 
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Set references to elements
         ivDisplay = (ImageView) findViewById(R.id.videoImageView);
         setupBtn = (Button) findViewById(R.id.setupBtn);
         playBtn = (Button) findViewById(R.id.playBtn);
@@ -59,12 +62,15 @@ public class MainActivity extends AppCompatActivity {
         pauseImgBtn = (ImageButton) findViewById(R.id.pauseImgBtn);
         teardownImgBtn = (ImageButton) findViewById(R.id.teardownImgBtn);
 
+        //Create new controller with reference to Main Activity and a handler
         _controller = new ClientController(this, new Handler());
 
+        //Set video names in dropdown
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, videoNames);
         videoDropdown.setAdapter(adapter);
 
+        //Add listeners to each button to call appropriate functions in Controller
         connectBtn.setOnClickListener(e -> {
             _controller.OnConnect();
         });
@@ -92,11 +98,13 @@ public class MainActivity extends AppCompatActivity {
         teardownImgBtn.setOnClickListener(e -> {
             _controller.OnTeardown();
         });
+        //Add listener to image view to show image buttons
         ivDisplay.setOnClickListener(e -> {
             _controller.OnVideoTap();
         });
     };
 
+    //Safely exit
     public void onDestroy(){
         _controller.OnExit();
         super.onDestroy();
@@ -122,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Show/hide image buttons over image view
     public void ShowHoverIcons(){
         imageBtns.setVisibility(View.VISIBLE);
     }
@@ -129,8 +138,7 @@ public class MainActivity extends AppCompatActivity {
         imageBtns.setVisibility(View.INVISIBLE);
     }
 
-    public void SetImage(Bitmap frame){
-        Log.d("MAIN", "Entered set image");
+    public void SetImage(Bitmap frame){     //Set frame in view
         ivDisplay.setImageBitmap(frame);
     }
 

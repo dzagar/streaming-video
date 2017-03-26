@@ -16,11 +16,12 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 public class RTP {
-    InetSocketAddress endPointServ;
-    DatagramSocket framesFromServCli = null;
-    RTPPacket _rtpPacket = null;
+    InetSocketAddress endPointServ; //server endpoint
+    DatagramSocket framesFromServCli = null;    //frames from server to client
+    RTPPacket _rtpPacket = null;    //one instance of RTP packet
 
     public RTP (int port, InetAddress servIP){
+        //Instantiate server endpoint, UDP socket, rtp packet
         endPointServ = new InetSocketAddress(servIP, port);
         try {
             framesFromServCli = new DatagramSocket(25000);
@@ -34,17 +35,17 @@ public class RTP {
     public byte[] GetFrame(){
 
         try {
+            //Rcv packetized video frame from server
             int length = framesFromServCli.getReceiveBufferSize();
             Log.d("RTP", "Buffer size: " + length);
             byte[] vidFramePkt = new byte[length];
             DatagramPacket pkt = new DatagramPacket(vidFramePkt, vidFramePkt.length);
             pkt.setData(vidFramePkt);
-            framesFromServCli.receive(pkt); //hangs here
+            framesFromServCli.receive(pkt);
+            //If rcvd, return, otherwise return null
             if (vidFramePkt.length > 0){
-                Log.d("RTP", "Returning video frame bytes");
                 return vidFramePkt;
             } else {
-                Log.d("RTP", "Not returning shit");
                 return null;
             }
         } catch (SocketException e){
@@ -54,9 +55,12 @@ public class RTP {
         }
     }
 
+    //Frame to image
     public Bitmap FrameToImage(byte[] frame){
+        //Create unpacketized frame byte array
         byte[] vidFramePkt = _rtpPacket.UnpackFrame(frame);
         try {
+            //Convert unpacketized frame byte array to bitmap and return
             Bitmap bmp = BitmapFactory.decodeByteArray(vidFramePkt, 0, vidFramePkt.length);
             return bmp;
         } catch (Exception e){
